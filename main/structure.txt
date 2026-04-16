@@ -1,0 +1,54 @@
+sp_illico/
+├── config/
+│   ├── connexion.php
+│   └── db_illico.sql
+├── includes/
+│   ├── auth.php
+│   ├── functions.php
+│   ├── header.php
+│   ├── footer.php
+│   └── sidebar.php
+├── assets/
+│   ├── css/
+│   │   ├── style.css
+│   │   └── dashboard.css
+│   ├── js/
+│   │   ├── main.js
+│   │   ├── dashboard.js
+│   │   └── validation.js
+│   ├── img/
+│   │   └── logo.png
+│   └── fonts/
+├── uploads/
+│   └── photos/
+├── lib/
+│   └── fpdf/
+│       └── fpdf.php
+├── index.php
+├── dashboard.php
+├── logout.php
+├── admin/
+│   ├── dashboard.php
+│   ├── utilisateurs.php
+│   ├── ajouter_utilisateur.php
+│   ├── modifier_utilisateur.php
+│   └── supprimer_utilisateur.php
+├── secretaire/
+│   ├── dashboard.php
+│   ├── creer_compte.php
+│   ├── modifier_compte.php
+│   ├── ajouter_client.php
+│   ├── liste_clients.php
+│   ├── depot.php
+│   ├── retrait.php
+│   └── verification.php
+├── caissier/
+│   ├── dashboard.php
+│   ├── depot.php
+│   ├── retrait.php
+│   └── verification.php
+└── commun/
+    ├── recherche.php
+    ├── vue_compte.php
+    ├── vue_client.php
+    └── impression.php
