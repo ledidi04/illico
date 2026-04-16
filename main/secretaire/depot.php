@@ -173,10 +173,12 @@ $currentPage = 'depot';
             <div class="name"><?= htmlspecialchars($_SESSION['nom_complet']) ?></div>
             <div class="role"><i class="fas fa-shield"></i> <?= ucfirst($_SESSION['role']) ?></div>
         </div>
-        <nav class="nav-menu">
-            <a href="<?= $_SESSION['role'] == 'secretaire' ? 'dashboard.php' : '../admin/dashboard.php' ?>" class="nav-item">
-                <i class="fas fa-gauge"></i> Tableau de bord
-            </a>
+         <nav class="nav-menu">
+            <a href="dashboard.php" class="nav-item "><i class="fas fa-gauge"></i> Tableau de bord</a>
+            <a href="creer_compte.php" class="nav-item"><i class="fas fa-user-plus"></i> Créer compte</a>
+            <a href="liste_clients.php" class="nav-item"><i class="fas fa-users"></i> Liste clients</a>
+            <a href="ajouter_client.php" class="nav-item"><i class="fas fa-user"></i> Ajouter client</a>
+            <div class="nav-divider"></div>
             <a href="depot.php" class="nav-item active"><i class="fas fa-arrow-down"></i> Dépôt</a>
             <a href="retrait.php" class="nav-item"><i class="fas fa-arrow-up"></i> Retrait</a>
             <a href="verification.php" class="nav-item"><i class="fas fa-search"></i> Vérification</a>

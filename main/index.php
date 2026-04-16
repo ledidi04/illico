@@ -492,7 +492,7 @@ $rememberedLogin = $_COOKIE['remember_login'] ?? '';
                            name="login" 
                            class="form-control" 
                            value="<?= htmlspecialchars($rememberedLogin) ?>" 
-                           placeholder="admin"
+                           placeholder="nom utilisateur"
                            required 
                            autofocus>
                 </div>

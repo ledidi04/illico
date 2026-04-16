@@ -93,6 +93,7 @@ CREATE TABLE comptes (
     id_compte CHAR(5) NOT NULL UNIQUE,
     succursale_id INT NOT NULL,
     type_compte_id INT NOT NULL,
+    devise ENUM('HTG', 'USD', 'EUR') DEFAULT 'HTG',
     date_creation DATE NOT NULL,
     solde DECIMAL(15,2) NOT NULL DEFAULT 0.00,
     titulaire_principal_id INT NOT NULL,

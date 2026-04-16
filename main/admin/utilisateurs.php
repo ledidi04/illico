@@ -297,10 +297,10 @@ $stats = $pdo->query("
             <div class="succursale"><i class="fas fa-building"></i> <?= htmlspecialchars($_SESSION['succursale_nom']) ?></div>
         </div>
         <nav class="nav-menu">
-            <a href="dashboard.php" class="nav-item active"><i class="fas fa-gauge"></i> Tableau de bord</a>
-            <a href="utilisateurs.php" class="nav-item"><i class="fas fa-users-gear"></i> Utilisateurs</a>
+            <a href="dashboard.php" class="nav-item "><i class="fas fa-gauge"></i> Tableau de bord</a>
+            <a href="utilisateurs.php" class="nav-item active"><i class="fas fa-users-gear"></i> Utilisateurs</a>
             <a href="#" class="nav-item"><i class="fas fa-users"></i> Clients</a>
-            <a href="#" class="nav-item"><i class="fas fa-credit-card"></i> Comptes</a>
+            <a href="compte.php" class="nav-item"><i class="fas fa-credit-card"></i> Comptes</a>
             <div class="nav-divider"></div>
             <a href="statistiques.php" class="nav-item"><i class="fas fa-chart-pie"></i> Statistiques</a>
             <a href="rapports.php" class="nav-item"><i class="fas fa-file-pdf"></i> Rapports</a>
@@ -481,11 +481,11 @@ $stats = $pdo->query("
                     </div>
                     <div class="form-group">
                         <label><i class="fas fa-user"></i> Nom complet *</label>
-                        <input type="text" name="nom_complet" class="form-control" placeholder="Ex: Jean Dupont" required>
+                        <input type="text" name="nom_complet" class="form-control" placeholder="Ex: Pierre Antoine" required>
                     </div>
                     <div class="form-group">
                         <label><i class="fas fa-at"></i> Nom d'utilisateur *</label>
-                        <input type="text" name="username" class="form-control" placeholder="Ex: jean.dupont" required>
+                        <input type="text" name="username" class="form-control" placeholder="Ex: Pierre.Antoine" required>
                     </div>
                     <div class="form-group">
                         <label><i class="fas fa-lock"></i> Mot de passe *</label>
@@ -505,7 +505,7 @@ $stats = $pdo->query("
                     </div>
                     <div class="form-group">
                         <label><i class="fas fa-envelope"></i> Email</label>
-                        <input type="email" name="email" class="form-control" placeholder="jean.dupont@spillico.ht">
+                        <input type="email" name="email" class="form-control" placeholder="Pierre.Antoine@spillico.ht">
                     </div>
                     <div class="form-group">
                         <label><i class="fas fa-phone"></i> Téléphone</label>

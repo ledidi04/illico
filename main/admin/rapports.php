@@ -167,13 +167,13 @@ $currentPage = 'rapports';
             <div class="name"><?= htmlspecialchars($_SESSION['nom_complet']) ?></div>
         </div>
             <nav class="nav-menu">
-                <a href="dashboard.php" class="nav-item active"><i class="fas fa-gauge"></i> Tableau de bord</a>
+                <a href="dashboard.php" class="nav-item "><i class="fas fa-gauge"></i> Tableau de bord</a>
                 <a href="utilisateurs.php" class="nav-item"><i class="fas fa-users-gear"></i> Utilisateurs</a>
                 <a href="#" class="nav-item"><i class="fas fa-users"></i> Clients</a>
-                <a href="#" class="nav-item"><i class="fas fa-credit-card"></i> Comptes</a>
+                <a href="compte.php" class="nav-item"><i class="fas fa-credit-card"></i> Comptes</a>
                 <div class="nav-divider"></div>
                 <a href="statistiques.php" class="nav-item"><i class="fas fa-chart-pie"></i> Statistiques</a>
-                <a href="rapports.php" class="nav-item"><i class="fas fa-file-pdf"></i> Rapports</a>
+                <a href="rapports.php" class="nav-item active"><i class="fas fa-file-pdf"></i> Rapports</a>
                 
                 <div class="nav-divider"></div>
             
