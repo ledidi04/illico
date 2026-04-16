@@ -30,7 +30,6 @@ sp_illico/
 ├── admin/
 │   ├── dashboard.php
 │   ├── utilisateurs.php
-│   ├── ajouter_utilisateur.php
 │   ├── modifier_utilisateur.php
 │   └── supprimer_utilisateur.php
 ├── secretaire/
