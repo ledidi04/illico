@@ -1,2 +1,2 @@
-# S-P-illico
+# illico
 Projet Banque illico
