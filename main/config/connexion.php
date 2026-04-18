@@ -1,11 +1,11 @@
 <?php
 // Configuration des sessions - DOIT être fait avant session_start()
-ini_set('session.cookie_httponly', 10);
-ini_set('session.use_only_cookies', 100);
+ini_set('session.cookie_httponly', 1);
+ini_set('session.use_only_cookies', 1);
 ini_set('session.cookie_secure', 0); // Mettre à 1 en production avec HTTPS
 ini_set('session.cookie_samesite', 'Lax');
 ini_set('session.gc_maxlifetime', 1800); // 30 minutes
-ini_set('session.use_strict_mode', 10);
+ini_set('session.use_strict_mode', 1);
 
 // Configuration de la base de données
 define('DB_HOST', 'localhost');

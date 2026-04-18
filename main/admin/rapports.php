@@ -98,25 +98,13 @@ $currentPage = 'rapports';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rapports - S&P illico</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+        <link rel="stylesheet" href="../assets/css/common.css">
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', 'Inter', sans-serif; background: #f1f5f9; display: flex; min-height: 100vh; }
         
-        .sidebar { width: 280px; background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%); color: white; padding: 24px 0; position: fixed; height: 100vh; overflow-y: auto; }
-        .sidebar-header { padding: 0 20px 24px; border-bottom: 1px solid #334155; margin-bottom: 24px; }
-        .sidebar-header h2 { color: #3b82f6; font-size: 22px; display: flex; align-items: center; gap: 10px; }
-        .sidebar-header p { color: #94a3b8; font-size: 13px; margin-top: 8px; }
-        .user-info-side { padding: 16px 20px; background: #1e293b; margin: 0 16px 20px; border-radius: 12px; }
-        .user-info-side .avatar { width: 48px; height: 48px; background: #3b82f6; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
-        .user-info-side .avatar i { font-size: 24px; }
-        .user-info-side .name { font-weight: 600; margin-bottom: 4px; }
-        .nav-menu { padding: 0 12px; }
-        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: #cbd5e1; text-decoration: none; border-radius: 10px; margin-bottom: 4px; }
-        .nav-item i { width: 24px; }
-        .nav-item:hover { background: #334155; color: white; }
-        .nav-item.active { background: #3b82f6; color: white; }
-        .nav-divider { height: 1px; background: #334155; margin: 16px 0; }
-        
+                
         .main-content { margin-left: 280px; flex: 1; padding: 24px; }
         
         .top-bar { background: white; padding: 16px 24px; border-radius: 16px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
@@ -157,29 +145,7 @@ $currentPage = 'rapports';
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h2><i class="fas fa-building-columns"></i> S&P illico</h2>
-            <p>Banque Communautaire</p>
-        </div>
-        <div class="user-info-side">
-            <div class="avatar"><i class="fas fa-user-cog"></i></div>
-            <div class="name"><?= htmlspecialchars($_SESSION['nom_complet']) ?></div>
-        </div>
-            <nav class="nav-menu">
-                <a href="dashboard.php" class="nav-item "><i class="fas fa-gauge"></i> Tableau de bord</a>
-                <a href="utilisateurs.php" class="nav-item"><i class="fas fa-users-gear"></i> Utilisateurs</a>
-                <a href="#" class="nav-item"><i class="fas fa-users"></i> Clients</a>
-                <a href="compte.php" class="nav-item"><i class="fas fa-credit-card"></i> Comptes</a>
-                <div class="nav-divider"></div>
-                <a href="statistiques.php" class="nav-item"><i class="fas fa-chart-pie"></i> Statistiques</a>
-                <a href="rapports.php" class="nav-item active"><i class="fas fa-file-pdf"></i> Rapports</a>
-                
-                <div class="nav-divider"></div>
-            
-                <a href="../logout.php" class="nav-item"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
-            </nav>
-    </div>
+       <?php require_once '../includes/sidebar.php'; ?>
     
     <div class="main-content" id="printableArea">
         <div class="top-bar no-print">

@@ -783,7 +783,7 @@ $date_taux = date('d/m/Y');
         <div class="nav-container">
             <a href="index.php" class="logo">
                 <div class="logo-icon">
-                    <i class="fas fa-building-columns"></i>
+                    <img src="main/logo.jpeg" alt="S&P illico" style="width: 80px; height: auto; margin-bottom: 15px;">
                 </div>
                 <div class="logo-text">S&P <span>illico</span></div>
             </a>
@@ -1042,14 +1042,14 @@ $date_taux = date('d/m/Y');
                 <div class="footer-contact">
                     <h4>Contact</h4>
                     <p><i class="fas fa-map-marker-alt"></i> Quartier Muraille, Terrier-Rouge, Haïti</p>
-                    <p><i class="fas fa-phone"></i> +509 2222-1111</p>
-                    <p><i class="fas fa-envelope"></i> contact@spillico.ht</p>
-                    <p><i class="fas fa-clock"></i> Lun-Ven: 8h00 - 16h00</p>
+                    <p><i class="fas fa-phone"></i> +509 3338-3509</p>
+                    <p><i class="fas fa-envelope"></i> illicoms01@gmail.com</p>
+                    <p><i class="fas fa-clock"></i> Lun-Dim: 8h00 - 20h00</p>
                     
-                    <div class="footer-newsletter" style="margin-top: 20px;">
+                    <!-- <div class="footer-newsletter" style="margin-top: 20px;">
                         <input type="email" placeholder="Votre email">
                         <button class="btn-subscribe">S'abonner à la newsletter</button>
-                    </div>
+                    </div> -->
                 </div>
             </div>
             

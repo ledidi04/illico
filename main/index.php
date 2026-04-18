@@ -415,7 +415,7 @@ $rememberedLogin = $_COOKIE['remember_login'] ?? '';
     <div class="login-container">
         <div class="login-left">
             <div class="brand">
-                <i class="fas fa-building-columns"></i>
+                <img src="logo.jpeg" alt="S&P illico" style="width: 80px; height: auto; margin-bottom: 15px;">
                 <h1>S&P illico</h1>
                 <p>Banque Communautaire</p>
             </div>
@@ -532,9 +532,18 @@ $rememberedLogin = $_COOKIE['remember_login'] ?? '';
                 <i class="fas fa-lock" style="margin-right: 6px; color: #10b981;"></i>
                 Connexion sécurisée • &copy; <?= date('Y') ?> S&P illico
             </div>
+
+            <div style="margin-top: 50px; text-align: center;">
+                <a href="../index.php" class="btn-outline-light">
+                    <i class="fas fa-arrow-left"></i>
+                    Retour à l'accueil
+                </a>
+            </div>
+    
         </div>
     </div>
-    
+
+   
     <script>
         function togglePassword() {
             const pwd = document.getElementById('password');

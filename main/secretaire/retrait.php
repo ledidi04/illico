@@ -2,92 +2,87 @@
 require_once '../config/connexion.php';
 session_start();
 
-if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['caissier', 'secretaire', 'admin'])) {
+if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['caissier','secretaire','admin'])) {
     header('Location: ../index.php');
     exit;
 }
 
-$message = '';
-$error = '';
-$compte_info = null;
+$message       = '';
+$error         = '';
+$compte_info   = null;
+$compte_apercu = null;
+
+if (!empty($_GET['id_compte'])) {
+    $stmt = $pdo->prepare("
+        SELECT c.id_compte, c.solde, c.devise, c.statut,
+               tc.nom AS type_compte, tc.solde_minimum,
+               CONCAT(cl.prenom,' ',cl.nom) AS titulaire
+        FROM comptes c JOIN types_comptes tc ON c.type_compte_id=tc.id
+        JOIN clients cl ON c.titulaire_principal_id=cl.id
+        WHERE c.id_compte=? AND c.statut='actif'");
+    $stmt->execute([trim($_GET['id_compte'])]);
+    $compte_apercu = $stmt->fetch() ?: null;
+    if (!$compte_apercu) $error = "Compte introuvable ou inactif.";
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $id_compte = trim($_POST['id_compte'] ?? '');
-    $montant = floatval($_POST['montant'] ?? 0);
+    $id_compte   = trim($_POST['id_compte']   ?? '');
+    $montant     = floatval($_POST['montant']  ?? 0);
     $description = trim($_POST['description'] ?? 'Retrait en espèces');
-    
-    if (empty($id_compte)) {
-        $error = "Veuillez saisir un numéro de compte.";
-    } elseif ($montant <= 0) {
-        $error = "Le montant doit être supérieur à 0.";
-    } else {
+
+    if (empty($id_compte))                       $error = "Veuillez saisir un numéro de compte.";
+    elseif (!preg_match('/^\d{5}$/',$id_compte)) $error = "Le numéro de compte doit contenir 5 chiffres.";
+    elseif ($montant <= 0)                       $error = "Le montant doit être supérieur à 0.";
+    elseif ($montant > 9999999.99)               $error = "Montant dépasse la limite autorisée.";
+    elseif ($montant >= 100000 && $_SESSION['role'] !== 'admin')
+        $error = "Les retraits ≥ 100 000 HTG sont réservés à l'administrateur.";
+    else {
         try {
             $pdo->beginTransaction();
-            
             $stmt = $pdo->prepare("
-                SELECT c.*, tc.nom as type_compte, tc.solde_minimum,
-                       CONCAT(cl.nom, ' ', cl.prenom) as titulaire,
-                       cl.id_client, cl.telephone
-                FROM comptes c
-                JOIN types_comptes tc ON c.type_compte_id = tc.id
-                JOIN clients cl ON c.titulaire_principal_id = cl.id
-                WHERE c.id_compte = ? AND c.statut = 'actif'
-                FOR UPDATE
-            ");
+                SELECT c.*, tc.nom AS type_compte, tc.solde_minimum,
+                       CONCAT(cl.prenom,' ',cl.nom) AS titulaire, cl.id_client, cl.telephone
+                FROM comptes c JOIN types_comptes tc ON c.type_compte_id=tc.id
+                JOIN clients cl ON c.titulaire_principal_id=cl.id
+                WHERE c.id_compte=? AND c.statut='actif' FOR UPDATE");
             $stmt->execute([$id_compte]);
             $compte = $stmt->fetch();
-            
-            if (!$compte) {
-                throw new Exception("Compte introuvable ou inactif.");
-            }
-            
-            $ancien_solde = $compte['solde'];
-            
-            // Vérifier le solde disponible
-            if ($ancien_solde < $montant) {
-                throw new Exception("Solde insuffisant. Solde disponible: " . number_format($ancien_solde, 2, ',', ' ') . " HTG");
-            }
-            
-            // Vérifier le solde minimum
-            $solde_apres_retrait = $ancien_solde - $montant;
-            if ($solde_apres_retrait < $compte['solde_minimum']) {
-                throw new Exception("Le retrait ferait passer le solde sous le minimum requis de " . number_format($compte['solde_minimum'], 2, ',', ' ') . " HTG.");
-            }
-            
-            // Mettre à jour le solde
-            $stmt = $pdo->prepare("UPDATE comptes SET solde = ? WHERE id = ?");
-            $stmt->execute([$solde_apres_retrait, $compte['id']]);
-            
-            // Enregistrer la transaction
-            $stmt = $pdo->prepare("
-                INSERT INTO transactions (compte_id, utilisateur_id, succursale_id, type, montant, solde_avant, solde_apres, description)
-                VALUES (?, ?, ?, 'retrait', ?, ?, ?, ?)
-            ");
-            $stmt->execute([
-                $compte['id'],
-                $_SESSION['user_id'],
-                $_SESSION['succursale_id'],
-                $montant,
-                $ancien_solde,
-                $solde_apres_retrait,
-                $description
-            ]);
-            
+            if (!$compte) throw new Exception("Compte introuvable ou inactif.");
+
+            $ancien_solde        = $compte['solde'];
+            $solde_apres_retrait = round($ancien_solde - $montant, 2);
+
+            if ($ancien_solde < $montant)
+                throw new Exception("Solde insuffisant. Disponible : ".number_format($ancien_solde,2,',',' ')." ".$compte['devise']);
+            if ($solde_apres_retrait < $compte['solde_minimum'])
+                throw new Exception("Ce retrait passerait sous le minimum requis de ".number_format($compte['solde_minimum'],2,',',' ')." ".$compte['devise'].". Disponible au retrait : ".number_format($ancien_solde-$compte['solde_minimum'],2,',',' ')." ".$compte['devise']);
+
+            $pdo->prepare("UPDATE comptes SET solde=?, updated_at=NOW() WHERE id=?")->execute([$solde_apres_retrait,$compte['id']]);
+            $pdo->prepare("INSERT INTO transactions (compte_id,utilisateur_id,succursale_id,type,montant,solde_avant,solde_apres,description) VALUES (?,?,?,'retrait',?,?,?,?)")
+                ->execute([$compte['id'],$_SESSION['user_id'],$_SESSION['succursale_id'],$montant,$ancien_solde,$solde_apres_retrait,$description]);
             $pdo->commit();
-            
-            $message = "Retrait de " . number_format($montant, 2, ',', ' ') . " HTG effectué avec succès.";
+
             $compte_info = [
-                'id_compte' => $compte['id_compte'],
-                'titulaire' => $compte['titulaire'],
-                'type_compte' => $compte['type_compte'],
-                'ancien_solde' => $ancien_solde,
+                'id_compte'     => $compte['id_compte'],
+                'titulaire'     => $compte['titulaire'],
+                'id_client'     => $compte['id_client'],
+                'type_compte'   => $compte['type_compte'],
+                'devise'        => $compte['devise'],
+                'ancien_solde'  => $ancien_solde,
                 'nouveau_solde' => $solde_apres_retrait,
-                'montant' => $montant
+                'montant'       => $montant,
+                'description'   => $description,
+                'date'          => date('d/m/Y'),
+                'heure'         => date('H:i:s'),
+                'operateur'     => $_SESSION['nom_complet'],
+                'succursale'    => $_SESSION['succursale_nom'],
             ];
-            
+            $message = "Retrait de ".number_format($montant,2,',',' ')." HTG effectué avec succès.";
+            $pdo->prepare("INSERT INTO logs_activites (utilisateur_id,action,details,ip_address) VALUES (?,'retrait',?,?)")
+                ->execute([$_SESSION['user_id'],"Retrait de $montant HTG sur compte $id_compte",$_SERVER['REMOTE_ADDR']]);
         } catch (Exception $e) {
-            $pdo->rollBack();
-            $error = "Erreur : " . $e->getMessage();
+            if ($pdo->inTransaction()) $pdo->rollBack();
+            $error = $e->getMessage();
         }
     }
 }
@@ -101,218 +96,160 @@ $currentPage = 'retrait';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Retrait - S&P illico</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', 'Inter', sans-serif; background: #f1f5f9; display: flex; min-height: 100vh; }
-        
-        .sidebar { width: 280px; background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%); color: white; padding: 24px 0; position: fixed; height: 100vh; overflow-y: auto; }
-        .sidebar-header { padding: 0 20px 24px; border-bottom: 1px solid #334155; margin-bottom: 24px; }
-        .sidebar-header h2 { color: #3b82f6; font-size: 22px; display: flex; align-items: center; gap: 10px; }
-        .sidebar-header p { color: #94a3b8; font-size: 13px; margin-top: 8px; }
-        .user-info-side { padding: 16px 20px; background: #1e293b; margin: 0 16px 20px; border-radius: 12px; }
-        .user-info-side .avatar { width: 48px; height: 48px; background: #3b82f6; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
-        .user-info-side .name { font-weight: 600; }
-        .user-info-side .role { color: #3b82f6; font-size: 13px; }
-        .nav-menu { padding: 0 12px; }
-        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: #cbd5e1; text-decoration: none; border-radius: 10px; margin-bottom: 4px; }
-        .nav-item i { width: 24px; }
-        .nav-item:hover { background: #334155; color: white; }
-        .nav-item.active { background: #3b82f6; color: white; }
-        .nav-divider { height: 1px; background: #334155; margin: 16px 0; }
-        
-        .main-content { margin-left: 280px; flex: 1; padding: 24px; }
-        
-        .top-bar { background: white; padding: 16px 24px; border-radius: 16px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        .page-title h1 { font-size: 24px; color: #1e293b; }
-        .breadcrumb { color: #64748b; font-size: 14px; }
-        .breadcrumb a { color: #3b82f6; text-decoration: none; }
-        .logout-btn { background: #ef4444; color: white; padding: 10px 18px; border-radius: 10px; text-decoration: none; }
-        
-        .card { background: white; border-radius: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); padding: 30px; max-width: 600px; margin: 0 auto; }
-        .card-header { text-align: center; margin-bottom: 30px; }
-        .card-header i { font-size: 48px; color: #dc2626; background: #fee2e2; padding: 16px; border-radius: 50%; margin-bottom: 16px; }
-        .card-header h2 { color: #1e293b; margin-bottom: 8px; }
-        
-        .alert { padding: 14px 20px; border-radius: 12px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
-        .alert-success { background: #dcfce7; color: #166534; border-left: 4px solid #16a34a; }
-        .alert-error { background: #fee2e2; color: #991b1b; border-left: 4px solid #ef4444; }
-        .alert-warning { background: #fef3c7; color: #92400e; border-left: 4px solid #f59e0b; }
-        
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; color: #475569; font-size: 14px; font-weight: 500; }
-        .form-group label i { margin-right: 8px; color: #3b82f6; }
-        .form-control { width: 100%; padding: 14px 16px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 16px; }
-        .form-control:focus { outline: none; border-color: #3b82f6; }
-        
-        .btn { padding: 14px 24px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; border: none; width: 100%; }
-        .btn-primary { background: #dc2626; color: white; }
-        .btn-primary:hover { background: #b91c1c; }
-        .btn-secondary { background: #64748b; color: white; }
-        
-        .result-card { background: #f8fafc; border-radius: 12px; padding: 20px; margin-top: 20px; }
-        .result-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #e2e8f0; }
-        .result-row:last-child { border-bottom: none; }
-        .result-label { color: #64748b; }
-        .result-value { font-weight: 600; color: #1e293b; }
-        .result-value.highlight { color: #dc2626; font-size: 18px; }
-        
-        .btn-imprimer { background: #3b82f6; color: white; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; margin-top: 15px; }
-        
-        .info-solde { background: #f8fafc; padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: center; }
-        .info-solde .solde-value { font-size: 28px; font-weight: 700; color: #1e293b; }
-    </style>
+    <link rel="stylesheet" href="../assets/css/common.css">
 </head>
 <body>
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h2><i class="fas fa-building-columns"></i> S&P illico</h2>
-            <p>Banque Communautaire</p>
-        </div>
-        <div class="user-info-side">
-            <div class="avatar"><i class="fas fa-user"></i></div>
-            <div class="name"><?= htmlspecialchars($_SESSION['nom_complet']) ?></div>
-            <div class="role"><i class="fas fa-shield"></i> <?= ucfirst($_SESSION['role']) ?></div>
-        </div>
-         <nav class="nav-menu">
-            <a href="dashboard.php" class="nav-item "><i class="fas fa-gauge"></i> Tableau de bord</a>
-            <a href="creer_compte.php" class="nav-item"><i class="fas fa-user-plus"></i> Créer compte</a>
-            <a href="liste_clients.php" class="nav-item"><i class="fas fa-users"></i> Liste clients</a>
-            <a href="ajouter_client.php" class="nav-item"><i class="fas fa-user"></i> Ajouter client</a>
-            <div class="nav-divider"></div>
-            <a href="depot.php" class="nav-item"><i class="fas fa-arrow-down"></i> Dépôt</a>
-            <a href="retrait.php" class="nav-item active"><i class="fas fa-arrow-up"></i> Retrait</a>
-            <a href="verification.php" class="nav-item"><i class="fas fa-search"></i> Vérification</a>
-            <div class="nav-divider"></div>
-            <a href="../logout.php" class="nav-item"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
-        </nav>
-    </div>
-    
+    <?php require_once '../includes/sidebar.php'; ?>
+
     <div class="main-content">
         <div class="top-bar">
             <div class="page-title">
                 <h1>Retrait</h1>
                 <div class="breadcrumb"><a href="dashboard.php">Accueil</a> / Retrait</div>
             </div>
-            <div>
-                <span style="margin-right: 15px; color: #64748b;">
-                    <i class="fas fa-building"></i> <?= htmlspecialchars($_SESSION['succursale_nom']) ?>
-                </span>
+            <div class="top-right">
+                <span class="top-succursale"><i class="fas fa-building"></i> <?= htmlspecialchars($_SESSION['succursale_nom']) ?></span>
                 <a href="../logout.php" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Déconnexion</a>
             </div>
         </div>
-        
-        <div class="card">
-            <div class="card-header">
-                <i class="fas fa-arrow-up"></i>
+
+        <div class="card" style="max-width:580px;margin:0 auto;">
+            <div class="card-header-icon">
+                <i class="fas fa-arrow-up" style="color:#dc2626;background:#fee2e2;"></i>
                 <h2>Effectuer un retrait</h2>
-                <p style="color: #64748b;">Saisissez les informations du retrait</p>
+                <p style="color:#64748b;">Débitez un compte client</p>
             </div>
-            
+
             <?php if ($error): ?>
             <div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> <?= htmlspecialchars($error) ?></div>
             <?php endif; ?>
-            
-            <?php if ($message): ?>
-            <div class="alert alert-success"><i class="fas fa-check-circle"></i> <?= htmlspecialchars($message) ?></div>
-            <?php endif; ?>
-            
+
             <?php if (!$compte_info): ?>
+
             <div class="alert alert-warning">
-                <i class="fas fa-info-circle"></i> 
-                <span>Le retrait nécessite un solde suffisant et le respect du solde minimum du compte.</span>
+                <i class="fas fa-info-circle"></i>
+                Le solde après retrait doit rester ≥ au solde minimum requis.
             </div>
-            
+
+            <?php if ($compte_apercu): ?>
+            <div class="alert alert-info" style="margin-bottom:16px;">
+                <div>
+                    <strong>Compte <?= htmlspecialchars($compte_apercu['id_compte']) ?></strong>
+                    — <?= htmlspecialchars($compte_apercu['titulaire']) ?><br>
+                    <?= htmlspecialchars($compte_apercu['type_compte']) ?> |
+                    Solde : <strong><?= number_format($compte_apercu['solde'],2,',',' ') ?> <?= $compte_apercu['devise'] ?></strong>
+                    (min requis : <?= number_format($compte_apercu['solde_minimum'],2,',',' ') ?> <?= $compte_apercu['devise'] ?>)
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <div id="valErr" style="display:none;" class="alert alert-error"></div>
+
             <form method="post" id="retraitForm">
                 <div class="form-group">
-                    <label for="id_compte"><i class="fas fa-credit-card"></i> Numéro de compte *</label>
-                    <input type="text" id="id_compte" name="id_compte" class="form-control" 
-                           placeholder="Ex: 00001" required autofocus maxlength="5">
+                    <label><i class="fas fa-credit-card"></i> Numéro de compte *</label>
+                    <div style="display:flex;gap:8px;">
+                        <input type="text" id="id_compte" name="id_compte" class="form-control"
+                               placeholder="Ex: 00001" value="<?= htmlspecialchars($_GET['id_compte']??'') ?>"
+                               maxlength="5" required autofocus>
+                        <button type="button" class="btn btn-outline btn-sm" onclick="voirCompte()" title="Voir solde">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="form-hint"><i class="fas fa-info-circle"></i> Format : 5 chiffres</div>
                 </div>
-                
                 <div class="form-group">
-                    <label for="montant"><i class="fas fa-money-bill"></i> Montant à retirer (HTG) *</label>
-                    <input type="number" id="montant" name="montant" class="form-control" 
-                           placeholder="0.00" step="0.01" min="0.01" required>
+                    <label><i class="fas fa-money-bill"></i> Montant à retirer (HTG) *</label>
+                    <input type="number" id="montant" name="montant" class="form-control"
+                           placeholder="0.00" step="0.01" min="0.01" max="9999999.99" required>
+                    <?php if ($_SESSION['role'] !== 'admin'): ?>
+                    <div class="form-hint" style="color:#f59e0b;">
+                        <i class="fas fa-lock"></i> Retraits ≥ 100 000 HTG réservés à l'administrateur.
+                    </div>
+                    <?php endif; ?>
                 </div>
-                
                 <div class="form-group">
-                    <label for="description"><i class="fas fa-pen"></i> Description (optionnel)</label>
-                    <input type="text" id="description" name="description" class="form-control" 
-                           placeholder="Retrait en espèces" value="Retrait en espèces">
+                    <label><i class="fas fa-pen"></i> Description <small>(optionnel)</small></label>
+                    <input type="text" name="description" class="form-control" value="Retrait en espèces" maxlength="255">
                 </div>
-                
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-danger btn-block">
                     <i class="fas fa-check-circle"></i> Valider le retrait
                 </button>
             </form>
+
             <?php else: ?>
-            <div class="result-card">
-                <h3 style="margin-bottom: 20px; color: #1e293b;"><i class="fas fa-check-circle" style="color: #16a34a;"></i> Retrait effectué avec succès</h3>
-                <div class="result-row">
-                    <span class="result-label">Compte</span>
-                    <span class="result-value"><?= htmlspecialchars($compte_info['id_compte']) ?></span>
-                </div>
-                <div class="result-row">
-                    <span class="result-label">Titulaire</span>
-                    <span class="result-value"><?= htmlspecialchars($compte_info['titulaire']) ?></span>
-                </div>
-                <div class="result-row">
-                    <span class="result-label">Type de compte</span>
-                    <span class="result-value"><?= htmlspecialchars($compte_info['type_compte']) ?></span>
-                </div>
-                <div class="result-row">
-                    <span class="result-label">Ancien solde</span>
-                    <span class="result-value"><?= number_format($compte_info['ancien_solde'], 2, ',', ' ') ?> HTG</span>
-                </div>
-                <div class="result-row">
-                    <span class="result-label">Montant retiré</span>
-                    <span class="result-value" style="color: #dc2626;">- <?= number_format($compte_info['montant'], 2, ',', ' ') ?> HTG</span>
-                </div>
-                <div class="result-row">
-                    <span class="result-label">Nouveau solde</span>
-                    <span class="result-value highlight"><?= number_format($compte_info['nouveau_solde'], 2, ',', ' ') ?> HTG</span>
-                </div>
-                
-                <div style="display: flex; gap: 10px; margin-top: 20px;">
-                    <button class="btn btn-primary" onclick="window.print()" style="flex: 1; background: #3b82f6;">
-                        <i class="fas fa-print"></i> Imprimer le reçu
-                    </button>
-                    <a href="retrait.php" class="btn btn-secondary" style="flex: 1; text-align: center; text-decoration: none;">
-                        <i class="fas fa-plus"></i> Nouveau retrait
-                    </a>
-                </div>
+            <!-- ══ RÉSUMÉ + TÉLÉCHARGEMENT PDF ══════════════════ -->
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                Retrait de <strong><?= number_format($compte_info['montant'],2,',',' ') ?> <?= $compte_info['devise'] ?></strong> effectué avec succès.
             </div>
+
+            <!-- Résumé visuel -->
+            <div style="background:#f8fafc;border-radius:12px;padding:20px;margin-bottom:20px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+                    <div>
+                        <div style="font-size:13px;color:#64748b;">Compte</div>
+                        <div style="font-size:18px;font-weight:700;color:#1e293b;"><?= htmlspecialchars($compte_info['id_compte']) ?></div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-size:13px;color:#64748b;">Nouveau solde</div>
+                        <div style="font-size:22px;font-weight:800;color:#dc2626;"><?= number_format($compte_info['nouveau_solde'],2,',',' ') ?> <?= $compte_info['devise'] ?></div>
+                    </div>
+                </div>
+
+                <?php foreach ([
+                    ['Titulaire',       $compte_info['titulaire']],
+                    ['Type de compte',  $compte_info['type_compte']],
+                    ['Ancien solde',    number_format($compte_info['ancien_solde'],2,',',' ').' '.$compte_info['devise']],
+                    ['Montant retiré',  '- '.number_format($compte_info['montant'],2,',',' ').' '.$compte_info['devise']],
+                    ['Date',            $compte_info['date'].' à '.$compte_info['heure']],
+                    ['Opérateur',       $compte_info['operateur']],
+                ] as [$l,$v]): ?>
+                <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #e2e8f0;">
+                    <span style="color:#64748b;font-size:13px;"><?= $l ?></span>
+                    <span style="font-weight:600;font-size:13px;<?= $l==='Montant retiré'?'color:#dc2626;':'' ?>">
+                        <?= htmlspecialchars($v) ?>
+                    </span>
+                </div>
+                <?php endforeach; ?>
+            </div>
+
+            <!-- Boutons PDF -->
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:18px;">
+
+                <a href="../generate_pdf.php?action=retrait&id_compte=<?= urlencode($compte_info['id_compte']) ?>"
+                target="_blank"
+                class="btn btn-danger"
+                style="justify-content:center; text-decoration:none;">
+                    <i class="fas fa-file-pdf"></i> Reçu de retrait PDF
+                </a>
+
+                <a href="retrait.php"
+                class="btn btn-secondary"
+                style="justify-content:center; text-decoration:none;">
+                    <i class="fas fa-plus"></i> Nouveau retrait
+                </a>
+
+            </div>
+
+
             <?php endif; ?>
         </div>
     </div>
-    
+
     <script>
+        const role = '<?= $_SESSION['role'] ?>';
         document.getElementById('retraitForm')?.addEventListener('submit', function(e) {
-            const idCompte = document.getElementById('id_compte').value;
-            const montant = document.getElementById('montant').value;
-            
-            if (!/^\d{5}$/.test(idCompte)) {
-                e.preventDefault();
-                alert('Le numéro de compte doit contenir exactement 5 chiffres.');
-                return false;
-            }
-            
-            if (parseFloat(montant) <= 0) {
-                e.preventDefault();
-                alert('Le montant doit être supérieur à 0.');
-                return false;
-            }
-            
-            if (confirm('Confirmer le retrait de ' + parseFloat(montant).toLocaleString('fr-FR') + ' HTG du compte ' + idCompte + ' ?')) {
-                return true;
-            }
-            e.preventDefault();
-            return false;
+            const err = document.getElementById('valErr');
+            const id  = document.getElementById('id_compte').value.trim();
+            const mt  = parseFloat(document.getElementById('montant').value);
+            err.style.display='none';
+            if (!/^\d{5}$/.test(id))            { e.preventDefault(); err.innerHTML='<i class="fas fa-exclamation-triangle"></i> Numéro de compte invalide.'; err.style.display='flex'; return; }
+            if (isNaN(mt)||mt<=0)                { e.preventDefault(); err.innerHTML='<i class="fas fa-exclamation-triangle"></i> Montant invalide.'; err.style.display='flex'; return; }
+            if (mt>=100000&&role!=='admin')       { e.preventDefault(); err.innerHTML='<i class="fas fa-lock"></i> Retraits ≥ 100 000 HTG réservés à l\'administrateur.'; err.style.display='flex'; return; }
         });
-        
-        document.getElementById('id_compte')?.addEventListener('input', function(e) {
-            this.value = this.value.replace(/[^0-9]/g, '').substring(0, 5);
-        });
+        document.getElementById('id_compte')?.addEventListener('input',function(){this.value=this.value.replace(/\D/g,'').substring(0,5);});
+        function voirCompte(){const id=document.getElementById('id_compte').value.trim();if(!/^\d{5}$/.test(id)){alert('5 chiffres requis.');return;}window.location.href=`retrait.php?id_compte=${id}`;}
     </script>
 </body>
 </html>
