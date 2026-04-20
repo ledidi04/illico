@@ -1,6 +1,21 @@
 <?php
 session_start();
 
+// ═══════════════════════════════════════════════════════════════
+// DÉTECTION DE LA RACINE DU SITE
+// ═══════════════════════════════════════════════════════════════
+// Définir l'URL de base du site (à adapter selon votre configuration)
+$base_url = '/'; // Racine du site
+// Si votre site est dans un sous-dossier, utilisez :
+// $base_url = '/illico/'; // ou '/main/' selon votre structure
+
+// Alternative : détection automatique
+$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+$host = $_SERVER['HTTP_HOST'];
+$script_dir = dirname($_SERVER['SCRIPT_NAME']);
+$base_url = rtrim($script_dir, '/\\') . '/';
+// Si error.php est à la racine, $base_url sera '/'
+
 // Récupérer le code d'erreur et le message
 $error_code = http_response_code() ?: 500;
 if (isset($_GET['code'])) {
@@ -89,22 +104,14 @@ $config = $error_config[$error_code];
 
 // Personnaliser le message si fourni
 if (!empty($error_message)) {
-    $config['message'] = $error_message;
+    $config['message'] = htmlspecialchars($error_message);
 }
 if (!empty($error_type)) {
-    $config['title'] = $error_type;
+    $config['title'] = htmlspecialchars($error_type);
 }
 
-// Taux de change (pour le footer)
-$taux_jour = [
-    'USD' => ['achat' => 132.50, 'vente' => 135.75],
-    'EUR' => ['achat' => 142.80, 'vente' => 146.50],
-    'CAD' => ['achat' => 96.40, 'vente' => 99.20]
-];
-$date_taux = date('d/m/Y');
-
 // URL de retour
-$referer = $_SERVER['HTTP_REFERER'] ?? 'index.php';
+$referer = $_SERVER['HTTP_REFERER'] ?? $base_url . 'index.php';
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -113,10 +120,14 @@ $referer = $_SERVER['HTTP_REFERER'] ?? 'index.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="S&P illico - Banque Communautaire moderne, sécurisée et accessible">
     <title>Erreur <?= $error_code ?> - S&P illico</title>
-
+    
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- BALISE BASE POUR LES CHEMINS ABSOLUS -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <base href="<?= $protocol ?>://<?= $host ?>/">
     
     <!-- Favicon -->
-    <link rel="icon" type="Favicon" href="main/logo.jpeg">
+    <link rel="icon" type="image/png" href="main/logo.jpeg">
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -147,6 +158,9 @@ $referer = $_SERVER['HTTP_REFERER'] ?? 'index.php';
             font-family: 'Inter', sans-serif; 
             background: var(--light);
             overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
         
         /* ========== NAVBAR ========== */
@@ -283,12 +297,13 @@ $referer = $_SERVER['HTTP_REFERER'] ?? 'index.php';
         
         /* ========== SECTION ERREUR ========== */
         .error-section {
-            min-height: calc(100vh - 200px);
+            flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 120px 24px 60px;
+            padding: 100px 24px 60px;
             background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            margin-top: 0;
         }
         
         .error-container {
@@ -297,7 +312,7 @@ $referer = $_SERVER['HTTP_REFERER'] ?? 'index.php';
             background: white;
             border-radius: 24px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            padding: 48px 40px;
+            padding: 40px;
             text-align: center;
             position: relative;
             overflow: hidden;
@@ -314,7 +329,7 @@ $referer = $_SERVER['HTTP_REFERER'] ?? 'index.php';
         }
         
         .error-code {
-            font-size: 120px;
+            font-size: 100px;
             font-weight: 800;
             line-height: 1;
             margin-bottom: 10px;
@@ -325,46 +340,46 @@ $referer = $_SERVER['HTTP_REFERER'] ?? 'index.php';
         }
         
         .error-icon {
-            width: 80px;
-            height: 80px;
+            width: 70px;
+            height: 70px;
             background: <?= $config['color'] ?>15;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 24px;
+            margin: 0 auto 20px;
         }
         
         .error-icon i {
-            font-size: 40px;
+            font-size: 35px;
             color: <?= $config['color'] ?>;
         }
         
         .error-title {
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 700;
             color: var(--dark);
-            margin-bottom: 16px;
+            margin-bottom: 12px;
         }
         
         .error-message {
-            font-size: 16px;
+            font-size: 15px;
             color: var(--gray);
-            line-height: 1.7;
-            margin-bottom: 32px;
+            line-height: 1.6;
+            margin-bottom: 25px;
         }
         
         .error-details {
             background: #f8fafc;
             border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 32px;
+            padding: 18px;
+            margin-bottom: 25px;
             text-align: left;
         }
         
         .detail-row {
             display: flex;
-            padding: 8px 0;
+            padding: 6px 0;
             border-bottom: 1px solid #e2e8f0;
         }
         
@@ -373,35 +388,35 @@ $referer = $_SERVER['HTTP_REFERER'] ?? 'index.php';
         }
         
         .detail-label {
-            width: 120px;
+            width: 110px;
             font-weight: 600;
             color: var(--dark);
-            font-size: 13px;
+            font-size: 12px;
         }
         
         .detail-value {
             flex: 1;
             color: var(--gray);
-            font-size: 13px;
+            font-size: 12px;
             word-break: break-word;
         }
         
         .error-actions {
             display: flex;
-            gap: 15px;
+            gap: 12px;
             justify-content: center;
             flex-wrap: wrap;
         }
         
         .btn {
-            padding: 14px 28px;
-            border-radius: 12px;
+            padding: 12px 24px;
+            border-radius: 10px;
             font-weight: 600;
-            font-size: 15px;
+            font-size: 14px;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             transition: all 0.3s;
             cursor: pointer;
             border: none;
@@ -444,7 +459,7 @@ $referer = $_SERVER['HTTP_REFERER'] ?? 'index.php';
         .footer {
             background: var(--dark);
             color: white;
-            padding: 60px 0 30px;
+            padding: 50px 0 25px;
         }
         
         .container {
@@ -456,24 +471,24 @@ $referer = $_SERVER['HTTP_REFERER'] ?? 'index.php';
         .footer-content {
             display: grid;
             grid-template-columns: 2fr 1fr 1fr 1.5fr;
-            gap: 40px;
-            margin-bottom: 40px;
+            gap: 35px;
+            margin-bottom: 35px;
         }
         
         .footer-about p {
             color: #94a3b8;
-            line-height: 1.8;
-            margin: 20px 0;
+            line-height: 1.7;
+            margin: 18px 0;
         }
         
         .footer-social {
             display: flex;
-            gap: 15px;
+            gap: 12px;
         }
         
         .social-link {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
             display: flex;
@@ -490,8 +505,8 @@ $referer = $_SERVER['HTTP_REFERER'] ?? 'index.php';
         }
         
         .footer-links h4 {
-            font-size: 18px;
-            margin-bottom: 20px;
+            font-size: 16px;
+            margin-bottom: 18px;
         }
         
         .footer-links ul {
@@ -499,13 +514,14 @@ $referer = $_SERVER['HTTP_REFERER'] ?? 'index.php';
         }
         
         .footer-links li {
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
         
         .footer-links a {
             color: #94a3b8;
             text-decoration: none;
             transition: color 0.3s;
+            font-size: 14px;
         }
         
         .footer-links a:hover {
@@ -514,30 +530,31 @@ $referer = $_SERVER['HTTP_REFERER'] ?? 'index.php';
         
         .footer-contact p {
             color: #94a3b8;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
             gap: 10px;
+            font-size: 14px;
         }
         
         .footer-contact i {
-            width: 20px;
+            width: 18px;
             color: var(--primary-light);
         }
         
         .footer-bottom {
             border-top: 1px solid rgba(255, 255, 255, 0.1);
-            padding-top: 30px;
+            padding-top: 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             color: #94a3b8;
-            font-size: 14px;
+            font-size: 13px;
         }
         
         .footer-bottom-links {
             display: flex;
-            gap: 30px;
+            gap: 25px;
         }
         
         .footer-bottom-links a {
@@ -564,13 +581,14 @@ $referer = $_SERVER['HTTP_REFERER'] ?? 'index.php';
                 box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             }
             .mobile-toggle { display: block; }
-            .error-code { font-size: 80px; }
-            .error-container { padding: 36px 24px; }
-            .error-title { font-size: 22px; }
+            .error-section { padding: 90px 16px 40px; }
+            .error-container { padding: 30px 20px; }
+            .error-code { font-size: 70px; }
+            .error-title { font-size: 20px; }
             .footer-content { grid-template-columns: 1fr; }
-            .footer-bottom { flex-direction: column; gap: 15px; text-align: center; }
+            .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
             .detail-row { flex-direction: column; }
-            .detail-label { width: 100%; margin-bottom: 4px; }
+            .detail-label { width: 100%; margin-bottom: 3px; }
         }
         
         /* Animation */
@@ -624,8 +642,8 @@ $referer = $_SERVER['HTTP_REFERER'] ?? 'index.php';
                 <i class="fas <?= $config['icon'] ?>"></i>
             </div>
             
-            <h1 class="error-title"><?= htmlspecialchars($config['title']) ?></h1>
-            <p class="error-message"><?= htmlspecialchars($config['message']) ?></p>
+            <h1 class="error-title"><?= $config['title'] ?></h1>
+            <p class="error-message"><?= $config['message'] ?></p>
             
             <div class="error-details">
                 <div class="detail-row">
@@ -647,7 +665,7 @@ $referer = $_SERVER['HTTP_REFERER'] ?? 'index.php';
                 <?php if (!empty($error_type)): ?>
                 <div class="detail-row">
                     <span class="detail-label"><i class="fas fa-tag"></i> Type d'erreur</span>
-                    <span class="detail-value"><?= htmlspecialchars($error_type) ?></span>
+                    <span class="detail-value"><?= $error_type ?></span>
                 </div>
                 <?php endif; ?>
                 <?php if (isset($_SESSION['user_id'])): ?>
@@ -673,7 +691,7 @@ $referer = $_SERVER['HTTP_REFERER'] ?? 'index.php';
                 </button>
             </div>
             
-            <p style="margin-top: 24px; font-size: 13px; color: var(--gray);">
+            <p style="margin-top: 20px; font-size: 12px; color: var(--gray);">
                 <i class="fas fa-headset"></i> Besoin d'aide ? Contactez le support : 
                 <strong>+509 3338-3509</strong> • <strong>illicoms01@gmail.com</strong>
             </p>
