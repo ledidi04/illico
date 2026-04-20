@@ -124,6 +124,7 @@ $currentPage = 'ajouter_client';
     <title>Ajouter un client - S&P illico</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/common.css">
+    <link rel="icon" type="favicon" href="../logo.jpeg">
 </head>
 <body>
     <?php require_once '../includes/sidebar.php'; ?>

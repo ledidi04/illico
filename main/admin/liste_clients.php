@@ -70,6 +70,7 @@ $currentPage = 'liste_clients';
     <title>Liste des clients - S&P illico</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/common.css">
+    <link rel="icon" type="favicon" href="../logo.jpeg">
     <style>
         .badge-titulaire { background: #dbeafe; color: #1e40af; }
         .badge-cotitulaire { background: #f3e8ff; color: #9333ea; }

@@ -196,6 +196,7 @@ $currentPage = 'creer_compte';
     <title>Création de compte - S&P illico</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/common.css">
+    <link rel="icon" type="favicon" href="../logo.jpeg">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>

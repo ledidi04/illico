@@ -126,6 +126,7 @@ $rememberedLogin = $_COOKIE['remember_login'] ?? '';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>S&P illico - Connexion</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="icon" type="favicon" href="logo.jpeg">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
@@ -415,13 +416,14 @@ $rememberedLogin = $_COOKIE['remember_login'] ?? '';
     <div class="login-container">
         <div class="login-left">
             <div class="brand">
+
                 <img src="logo.jpeg" alt="S&P illico" style="width: 80px; height: auto; margin-bottom: 15px;">
                 <h1>S&P illico</h1>
                 <p>Banque Communautaire</p>
             </div>
             <div class="features">
                 <div class="feature">
-                    <i class="fas fa-shield-halved"></i>
+                    <i class="fas fa-bank"></i>
                     <div>
                         <h3>Sécurité Bancaire</h3>
                         <p>Protection avancée de vos transactions et données personnelles</p>

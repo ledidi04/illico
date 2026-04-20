@@ -1030,6 +1030,120 @@ switch ($action) {
         genFicheClientSeul($pdo, $id_client);
         break;
 
+    // ════════════════════════════════════════════════════════════════
+// PDF RAPPORT (NOUVEAU)
+// ════════════════════════════════════════════════════════════════
+case 'rapport':
+    $periode = $_GET['periode'] ?? 'jour';
+    $date_debut = $_GET['date_debut'] ?? date('Y-m-d');
+    $date_fin = $_GET['date_fin'] ?? date('Y-m-d');
+    
+    // Titre selon période
+    switch ($periode) {
+        case 'jour': $titre = "Rapport journalier - " . date('d/m/Y', strtotime($date_debut)); break;
+        case 'semaine': $titre = "Rapport hebdomadaire"; break;
+        case 'mois': $titre = "Rapport mensuel - " . date('F Y', strtotime($date_debut)); break;
+        case 'annee': $titre = "Rapport annuel - " . date('Y', strtotime($date_debut)); break;
+        default: $titre = "Rapport personnalisé";
+    }
+    
+    // Récupération des données
+    $tx = $pdo->prepare("
+        SELECT COUNT(*) as nb, COALESCE(SUM(CASE WHEN type='depot' THEN montant ELSE 0 END),0) as depots,
+               COALESCE(SUM(CASE WHEN type='retrait' THEN montant ELSE 0 END),0) as retraits,
+               COALESCE(SUM(montant),0) as volume
+        FROM transactions WHERE DATE(date_transaction) BETWEEN ? AND ?
+    ");
+    $tx->execute([$date_debut, $date_fin]);
+    $data = $tx->fetch();
+    
+    // Totaux généraux
+    $total_clients = $pdo->query("SELECT COUNT(*) as total FROM clients")->fetch()['total'];
+    $total_personnel = $pdo->query("SELECT COUNT(*) as total FROM utilisateurs WHERE actif = 1")->fetch()['total'];
+    $total_comptes = $pdo->query("SELECT COUNT(*) as total FROM comptes WHERE statut = 'actif'")->fetch()['total'];
+    $total_depots_global = $pdo->query("SELECT COALESCE(SUM(solde), 0) as total FROM comptes WHERE statut = 'actif'")->fetch()['total'];
+    
+    // Transactions
+    $transactions = $pdo->prepare("
+        SELECT t.*, c.id_compte, c.devise, CONCAT(cl.nom,' ',cl.prenom) as client, u.username
+        FROM transactions t
+        JOIN comptes c ON t.compte_id=c.id
+        JOIN clients cl ON c.titulaire_principal_id=cl.id
+        JOIN utilisateurs u ON t.utilisateur_id=u.id
+        WHERE DATE(t.date_transaction) BETWEEN ? AND ?
+        ORDER BY t.date_transaction DESC LIMIT 50
+    ");
+    $transactions->execute([$date_debut, $date_fin]);
+    
+    $pdf = new IllicoPDF('P','mm','A4');
+    $pdf->AliasNbPages();
+    $pdf->AddPage();
+    $pdf->SetMargins(IllicoPDF::M_L, 45, IllicoPDF::M_R);
+    $pdf->SetAutoPageBreak(true, 25);
+    
+    $pdf->bandeHeader('RAPPORT D\'ACTIVITE', $titre);
+    
+    // Résumé
+    $pdf->sectionTitle('RESUME DE LA PERIODE');
+    $pdf->dataRow('Nombre de transactions', number_format($data['nb']), false, IllicoPDF::C_TEXTE, true);
+    $pdf->dataRow('Volume total', number_format($data['volume'], 0, ',', ' ') . ' HTG', false, IllicoPDF::C_TEXTE, false);
+    $pdf->dataRow('Total dépôts', number_format($data['depots'], 0, ',', ' ') . ' HTG', false, IllicoPDF::C_VERT, true);
+    $pdf->dataRow('Total retraits', number_format($data['retraits'], 0, ',', ' ') . ' HTG', false, IllicoPDF::C_ROUGE, false);
+    
+    $pdf->sectionTitle('TOTAUX GENERAUX');
+    $pdf->dataRow('Total clients', number_format($total_clients), false, IllicoPDF::C_TEXTE, true);
+    $pdf->dataRow('Personnel actif', number_format($total_personnel), false, IllicoPDF::C_TEXTE, false);
+    $pdf->dataRow('Comptes actifs', number_format($total_comptes), false, IllicoPDF::C_TEXTE, true);
+    $pdf->dataRow('Total dépôts (tous comptes)', number_format($total_depots_global, 0, ',', ' ') . ' HTG', false, IllicoPDF::C_VERT, false);
+    
+    // Liste des transactions
+    $pdf->sectionTitle('DETAIL DES TRANSACTIONS');
+    
+    if ($transactions->rowCount() > 0) {
+        $pdf->SetFont('Arial','B',8);
+        $pdf->setColor(IllicoPDF::C_BLEU);
+        $pdf->SetFillColor(219,234,254);
+        $headers = ['Date', 'Compte', 'Client', 'Type', 'Montant'];
+        $colW = [35, 25, 45, 25, 50];
+        $xc = IllicoPDF::M_L;
+        foreach ($headers as $i => $h) {
+            $pdf->Cell($colW[$i], 7, $h, 1, 0, 'C', true);
+        }
+        $pdf->Ln();
+        
+        $pdf->SetFont('Arial','',7.5);
+        while ($t = $transactions->fetch()) {
+            $fill = ($transactions->rowCount() % 2 == 0);
+            if ($fill) $pdf->SetFillColor(248,250,252);
+            
+            $pdf->SetX(IllicoPDF::M_L);
+            $pdf->Cell($colW[0], 6, date('d/m/Y H:i', strtotime($t['date_transaction'])), 'LR', 0, 'L', $fill);
+            $pdf->Cell($colW[1], 6, $t['id_compte'], 'LR', 0, 'L', $fill);
+            $pdf->Cell($colW[2], 6, ct(substr($t['client'], 0, 20)), 'LR', 0, 'L', $fill);
+            
+            $typeColor = $t['type'] == 'depot' ? IllicoPDF::C_VERT : IllicoPDF::C_ROUGE;
+            $pdf->setColor($typeColor);
+            $pdf->Cell($colW[3], 6, ucfirst($t['type']), 'LR', 0, 'L', $fill);
+            
+            $pdf->setColor(IllicoPDF::C_TEXTE);
+            $pdf->Cell($colW[4], 6, number_format($t['montant'], 2, ',', ' ') . ' ' . $t['devise'], 'LR', 1, 'R', $fill);
+        }
+        $pdf->SetX(IllicoPDF::M_L);
+        $pdf->Cell(array_sum($colW), 0, '', 'T');
+    } else {
+        $pdf->SetFont('Arial','I',9);
+        $pdf->setColor(IllicoPDF::C_GRIS);
+        $pdf->Cell(0, 7, 'Aucune transaction sur cette période', 0, 1, 'C');
+    }
+    
+    $pdf->Ln(5);
+    $pdf->SetFont('Arial','I',8);
+    $pdf->setColor(IllicoPDF::C_GRIS);
+    $pdf->Cell(0, 5, 'Rapport généré le ' . date('d/m/Y à H:i') . ' par ' . $_SESSION['nom_complet'], 0, 1, 'R');
+    
+    $pdf->Output('D', 'rapport_' . $periode . '_' . date('Ymd_His') . '.pdf');
+    exit;
+
     default:
         http_response_code(400);
         echo '<h2>S&P illico — Générateur PDF</h2>';

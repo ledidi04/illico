@@ -77,6 +77,7 @@ $currentPage = 'verification';
     <title>Vérification - S&P illico</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/common.css">
+    <link rel="icon" type="favicon" href="../logo.jpeg">
     <style>
         .info-grid { display:grid;grid-template-columns:repeat(2,1fr);gap:14px; }
         .info-item { padding:12px;background:#f8fafc;border-radius:9px; }

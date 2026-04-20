@@ -16,3 +16,7 @@
 2026-04-17 23:07:28 - Erreur de connexion DB: SQLSTATE[HY000] [2002] No connection could be made because the target machine actively refused it - []
 2026-04-17 23:08:30 - Erreur de connexion DB: SQLSTATE[HY000] [2002] No connection could be made because the target machine actively refused it - []
 2026-04-18 00:27:31 - Erreur de connexion DB: SQLSTATE[HY000] [2002] No connection could be made because the target machine actively refused it - []
+2026-04-20 03:28:58 - Erreur de connexion DB: SQLSTATE[HY000] [1045] Access denied for user 'root'@'localhost' (using password: NO) - []
+2026-04-20 03:29:38 - Erreur de connexion DB: SQLSTATE[HY000] [1045] Access denied for user 'root'@'localhost' (using password: NO) - []
+2026-04-20 03:30:41 - Erreur de connexion DB: SQLSTATE[HY000] [1045] Access denied for user 'root'@'localhost' (using password: NO) - []
+2026-04-20 03:30:52 - Erreur de connexion DB: SQLSTATE[HY000] [1045] Access denied for user 'root'@'localhost' (using password: NO) - []

@@ -39,7 +39,7 @@ $date_taux = date('d/m/Y');
     <title>S&P illico - Banque Communautaire</title>
     
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="assets/img/favicon.png">
+    <link rel="icon" type="favicon" href="main/logo.jpeg">
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
