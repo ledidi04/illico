@@ -25,6 +25,8 @@ sp_illico/
 │   └── fpdf/
 │       └── fpdf.php
 ├── index.php
+├── error.php
+├── .htaccess
 ├── dashboard.php
 ├── logout.php
 ├── admin/
