@@ -113,9 +113,10 @@ $referer = $_SERVER['HTTP_REFERER'] ?? 'index.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="S&P illico - Banque Communautaire moderne, sécurisée et accessible">
     <title>Erreur <?= $error_code ?> - S&P illico</title>
+
     
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="main/logo.jpeg">
+    <link rel="icon" type="Favicon" href="main/logo.jpeg">
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
