@@ -1,26 +1,33 @@
 <?php
 session_start();
 
+// ═══════════════════════════════════════════════════════════════
+// DÉTECTION DE LA RACINE DU SITE
+// ═══════════════════════════════════════════════════════════════
+$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+$host = $_SERVER['HTTP_HOST'];
+$base_url = $protocol . '://' . $host . '/';
+
 // Si déjà connecté, rediriger vers le dashboard approprié
 if (isset($_SESSION['user_id'])) {
     $role = $_SESSION['role'] ?? '';
     switch ($role) {
         case 'admin':
-            header('Location: admin/dashboard.php');
+            header('Location: ' . $base_url . 'main/admin/dashboard.php');
             break;
         case 'secretaire':
-            header('Location: secretaire/dashboard.php');
+            header('Location: ' . $base_url . 'main/secretaire/dashboard.php');
             break;
         case 'caissier':
-            header('Location: caissier/dashboard.php');
+            header('Location: ' . $base_url . 'main/caissier/dashboard.php');
             break;
         default:
-            header('Location: login.php');
+            header('Location: ' . $base_url . 'main/login.php');
     }
     exit;
 }
 
-// Taux de change simulés (à remplacer par une API en production)
+// Taux de change simulés
 $taux_jour = [
     'USD' => ['achat' => 132.50, 'vente' => 135.75],
     'EUR' => ['achat' => 142.80, 'vente' => 146.50],
@@ -36,10 +43,19 @@ $date_taux = date('d/m/Y');
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="S&P illico - Banque Communautaire moderne, sécurisée et accessible">
     <meta name="keywords" content="banque, Haïti, S&P illico, services bancaires, épargne, crédit">
+    
+    <!-- Google Site Verification -->
+    <meta name="google-site-verification" content="3nwKsS1wmJGr_cQaYEeoI9Uekodt6WThBHFCblXmXQA" />
+    
     <title>S&P illico - Banque Communautaire</title>
     
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- BALISE BASE POUR LES CHEMINS ABSOLUS -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <base href="<?= $base_url ?>">
+    
     <!-- Favicon -->
-    <link rel="icon" type="favicon" href="main/logo.jpeg">
+    <link rel="icon" type="image/png" href="main/logo.jpeg">
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -117,6 +133,13 @@ $date_taux = date('d/m/Y');
             justify-content: center;
             color: white;
             font-size: 24px;
+            overflow: hidden;
+        }
+        
+        .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         
         .logo-text {
@@ -686,36 +709,6 @@ $date_taux = date('d/m/Y');
             color: var(--primary-light);
         }
         
-        .footer-newsletter input {
-            width: 100%;
-            padding: 12px 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            color: white;
-            margin-bottom: 10px;
-        }
-        
-        .footer-newsletter input::placeholder {
-            color: #94a3b8;
-        }
-        
-        .btn-subscribe {
-            width: 100%;
-            padding: 12px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .btn-subscribe:hover {
-            background: var(--primary-light);
-        }
-        
         .footer-bottom {
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             padding-top: 30px;
@@ -738,14 +731,8 @@ $date_taux = date('d/m/Y');
         
         /* ========== ANIMATIONS ========== */
         @keyframes slideInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         /* ========== RESPONSIVE ========== */
@@ -781,9 +768,9 @@ $date_taux = date('d/m/Y');
     <!-- ========== NAVBAR ========== -->
     <nav class="navbar" id="navbar">
         <div class="nav-container">
-            <a href="index.php" class="logo">
+            <a href="./" class="logo">
                 <div class="logo-icon">
-                    <img src="main/logo.jpeg" alt="S&P illico" style="width: 80px; height: auto; margin-bottom: 15px;">
+                    <img src="main/logo.jpeg" alt="S&P illico" style="width: 100%; height: auto;">
                 </div>
                 <div class="logo-text">S&P <span>illico</span></div>
             </a>
@@ -794,7 +781,7 @@ $date_taux = date('d/m/Y');
             
             <div class="nav-menu">
                 <div class="nav-links" id="navLinks">
-                    <a href="index.php" class="nav-link active">Accueil</a>
+                    <a href="./" class="nav-link active">Accueil</a>
                     <a href="#services" class="nav-link">Services</a>
                     <a href="#rates" class="nav-link">Taux</a>
                     <a href="#about" class="nav-link">À propos</a>
@@ -811,7 +798,6 @@ $date_taux = date('d/m/Y');
     <!-- ========== CARROUSEL ========== -->
     <section class="carousel">
         <div class="carousel-container">
-            <!-- Slide 1 -->
             <div class="carousel-slide active" style="background-image: url('https://images.unsplash.com/photo-1560520653-9e0e4c89eb11?w=1600');">
                 <div class="slide-overlay"></div>
                 <div class="slide-content">
@@ -827,7 +813,6 @@ $date_taux = date('d/m/Y');
                 </div>
             </div>
             
-            <!-- Slide 2 -->
             <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1600');">
                 <div class="slide-overlay"></div>
                 <div class="slide-content">
@@ -843,7 +828,6 @@ $date_taux = date('d/m/Y');
                 </div>
             </div>
             
-            <!-- Slide 3 -->
             <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=1600');">
                 <div class="slide-overlay"></div>
                 <div class="slide-content">
@@ -860,14 +844,12 @@ $date_taux = date('d/m/Y');
             </div>
         </div>
         
-        <!-- Indicateurs -->
         <div class="carousel-indicators">
             <div class="indicator active" data-slide="0"></div>
             <div class="indicator" data-slide="1"></div>
             <div class="indicator" data-slide="2"></div>
         </div>
         
-        <!-- Flèches -->
         <button class="carousel-arrow prev" onclick="changeSlide(-1)">
             <i class="fas fa-chevron-left"></i>
         </button>
@@ -886,33 +868,22 @@ $date_taux = date('d/m/Y');
             
             <div class="services-grid">
                 <div class="service-card" data-aos="fade-up" data-aos-delay="100">
-                    <div class="service-icon">
-                        <i class="fas fa-piggy-bank"></i>
-                    </div>
+                    <div class="service-icon"><i class="fas fa-piggy-bank"></i></div>
                     <h3>Compte Épargne</h3>
                     <p>Faites fructifier votre argent avec nos comptes épargne à taux compétitifs.</p>
                 </div>
-                
                 <div class="service-card" data-aos="fade-up" data-aos-delay="200">
-                    <div class="service-icon">
-                        <i class="fas fa-credit-card"></i>
-                    </div>
+                    <div class="service-icon"><i class="fas fa-credit-card"></i></div>
                     <h3>Compte Courant</h3>
                     <p>Gérez vos opérations quotidiennes avec flexibilité et simplicité.</p>
                 </div>
-                
                 <div class="service-card" data-aos="fade-up" data-aos-delay="300">
-                    <div class="service-icon">
-                        <i class="fas fa-exchange-alt"></i>
-                    </div>
+                    <div class="service-icon"><i class="fas fa-exchange-alt"></i></div>
                     <h3>Virements</h3>
                     <p>Transférez de l'argent rapidement et en toute sécurité entre comptes.</p>
                 </div>
-                
                 <div class="service-card" data-aos="fade-up" data-aos-delay="400">
-                    <div class="service-icon">
-                        <i class="fas fa-shield-alt"></i>
-                    </div>
+                    <div class="service-icon"><i class="fas fa-shield-alt"></i></div>
                     <h3>Sécurité 24/7</h3>
                     <p>Vos transactions et données sont protégées par les dernières technologies.</p>
                 </div>
@@ -933,32 +904,19 @@ $date_taux = date('d/m/Y');
                     <h3><i class="fas fa-dollar-sign"></i> Taux de change</h3>
                     <table>
                         <thead>
-                            <tr>
-                                <th>Devise</th>
-                                <th>Achat (HTG)</th>
-                                <th>Vente (HTG)</th>
-                            </tr>
+                            <tr><th>Devise</th><th>Achat (HTG)</th><th>Vente (HTG)</th></tr>
                         </thead>
                         <tbody>
                             <?php foreach ($taux_jour as $devise => $taux): ?>
                             <tr>
-                                <td>
-                                    <strong><?= $devise ?></strong>
-                                    <?php if ($devise == 'USD'): ?>
-                                    <span style="color: #10b981; margin-left: 5px;"><i class="fas fa-arrow-up"></i></span>
-                                    <?php elseif ($devise == 'EUR'): ?>
-                                    <span style="color: #ef4444; margin-left: 5px;"><i class="fas fa-arrow-down"></i></span>
-                                    <?php endif; ?>
-                                </td>
+                                <td><strong><?= $devise ?></strong></td>
                                 <td><?= number_format($taux['achat'], 2) ?></td>
                                 <td><?= number_format($taux['vente'], 2) ?></td>
                             </tr>
                             <?php endforeach; ?>
                         </tbody>
                     </table>
-                    <div class="rate-date">
-                        <i class="far fa-clock"></i> Dernière mise à jour : aujourd'hui à 09:00
-                    </div>
+                    <div class="rate-date"><i class="far fa-clock"></i> Dernière mise à jour : aujourd'hui à 09:00</div>
                 </div>
                 
                 <div class="converter-box" data-aos="fade-left">
@@ -1003,9 +961,7 @@ $date_taux = date('d/m/Y');
             <div class="footer-content">
                 <div class="footer-about">
                     <div class="logo">
-                        <div class="logo-icon">
-                            <i class="fas fa-building-columns"></i>
-                        </div>
+                        <div class="logo-icon"><i class="fas fa-building-columns"></i></div>
                         <div class="logo-text" style="color: white;">S&P <span>illico</span></div>
                     </div>
                     <p>Votre partenaire bancaire de confiance, engagé à offrir des services financiers accessibles et innovants à toute la communauté haïtienne.</p>
@@ -1016,18 +972,16 @@ $date_taux = date('d/m/Y');
                         <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
                     </div>
                 </div>
-                
                 <div class="footer-links">
                     <h4>Liens rapides</h4>
                     <ul>
-                        <li><a href="index.php">Accueil</a></li>
+                        <li><a href="./">Accueil</a></li>
                         <li><a href="#services">Services</a></li>
                         <li><a href="#rates">Taux du jour</a></li>
                         <li><a href="#">À propos</a></li>
                         <li><a href="#">Carrières</a></li>
                     </ul>
                 </div>
-                
                 <div class="footer-links">
                     <h4>Services</h4>
                     <ul>
@@ -1038,21 +992,14 @@ $date_taux = date('d/m/Y');
                         <li><a href="#">Cartes bancaires</a></li>
                     </ul>
                 </div>
-                
                 <div class="footer-contact">
                     <h4>Contact</h4>
                     <p><i class="fas fa-map-marker-alt"></i> Quartier Muraille, Terrier-Rouge, Haïti</p>
                     <p><i class="fas fa-phone"></i> +509 3338-3509</p>
                     <p><i class="fas fa-envelope"></i> illicoms01@gmail.com</p>
                     <p><i class="fas fa-clock"></i> Lun-Dim: 8h00 - 20h00</p>
-                    
-                    <!-- <div class="footer-newsletter" style="margin-top: 20px;">
-                        <input type="email" placeholder="Votre email">
-                        <button class="btn-subscribe">S'abonner à la newsletter</button>
-                    </div> -->
                 </div>
             </div>
-            
             <div class="footer-bottom">
                 <p>&copy; <?= date('Y') ?> S&P illico - Banque Communautaire. Tous droits réservés.</p>
                 <div class="footer-bottom-links">
@@ -1064,26 +1011,15 @@ $date_taux = date('d/m/Y');
         </div>
     </footer>
     
-    <!-- Scripts -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        // Initialisation AOS
-        AOS.init({
-            duration: 800,
-            once: true
-        });
+        AOS.init({ duration: 800, once: true });
         
-        // Navbar scroll effect
         window.addEventListener('scroll', function() {
             const navbar = document.getElementById('navbar');
-            if (window.scrollY > 50) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
+            navbar.classList.toggle('scrolled', window.scrollY > 50);
         });
         
-        // Carousel
         let currentSlide = 0;
         const slides = document.querySelectorAll('.carousel-slide');
         const indicators = document.querySelectorAll('.indicator');
@@ -1092,53 +1028,31 @@ $date_taux = date('d/m/Y');
         function showSlide(index) {
             if (index >= slides.length) index = 0;
             if (index < 0) index = slides.length - 1;
-            
-            slides.forEach(slide => slide.classList.remove('active'));
-            indicators.forEach(ind => ind.classList.remove('active'));
-            
+            slides.forEach(s => s.classList.remove('active'));
+            indicators.forEach(i => i.classList.remove('active'));
             slides[index].classList.add('active');
             indicators[index].classList.add('active');
             currentSlide = index;
         }
         
-        function changeSlide(direction) {
-            showSlide(currentSlide + direction);
-            resetAutoSlide();
-        }
+        function changeSlide(d) { showSlide(currentSlide + d); resetAutoSlide(); }
+        function resetAutoSlide() { clearInterval(autoSlideInterval); autoSlideInterval = setInterval(() => showSlide(currentSlide + 1), 5000); }
         
-        function resetAutoSlide() {
-            clearInterval(autoSlideInterval);
-            autoSlideInterval = setInterval(() => showSlide(currentSlide + 1), 5000);
-        }
-        
-        // Event listeners pour les indicateurs
-        indicators.forEach((indicator, index) => {
-            indicator.addEventListener('click', () => {
-                showSlide(index);
-                resetAutoSlide();
-            });
-        });
-        
-        // Démarrer le défilement automatique
+        indicators.forEach((ind, i) => ind.addEventListener('click', () => { showSlide(i); resetAutoSlide(); }));
         autoSlideInterval = setInterval(() => showSlide(currentSlide + 1), 5000);
         
-        // Mobile menu toggle
-        document.getElementById('mobileToggle').addEventListener('click', function() {
+        document.getElementById('mobileToggle').addEventListener('click', () => {
             document.getElementById('navLinks').classList.toggle('active');
         });
         
-        // Smooth scroll pour les liens d'ancrage
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
                 e.preventDefault();
                 const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth' });
-                }
+                if (target) target.scrollIntoView({ behavior: 'smooth' });
             });
         });
         
-        // Convertisseur de devises
         const rates = <?= json_encode($taux_jour) ?>;
         rates['HTG'] = { achat: 1, vente: 1 };
         
@@ -1146,30 +1060,17 @@ $date_taux = date('d/m/Y');
             const amount = parseFloat(document.getElementById('amount').value) || 0;
             const from = document.getElementById('fromCurrency').value;
             const to = document.getElementById('toCurrency').value;
-            
             let result;
-            if (from === to) {
-                result = amount;
-            } else if (from === 'HTG') {
-                result = amount / rates[to].vente;
-            } else if (to === 'HTG') {
-                result = amount * rates[from].achat;
-            } else {
-                const inHTG = amount * rates[from].achat;
-                result = inHTG / rates[to].vente;
-            }
+            if (from === to) result = amount;
+            else if (from === 'HTG') result = amount / rates[to].vente;
+            else if (to === 'HTG') result = amount * rates[from].achat;
+            else result = (amount * rates[from].achat) / rates[to].vente;
             
-            document.getElementById('resultAmount').textContent = result.toLocaleString('fr-FR', { 
-                minimumFractionDigits: 2, 
-                maximumFractionDigits: 2 
-            });
+            document.getElementById('resultAmount').textContent = result.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             document.getElementById('resultLabel').textContent = to;
         }
         
-        // Initialiser le convertisseur
         convertCurrency();
-        
-        // Mettre à jour le convertisseur quand les sélecteurs changent
         document.getElementById('fromCurrency').addEventListener('change', convertCurrency);
         document.getElementById('toCurrency').addEventListener('change', convertCurrency);
         document.getElementById('amount').addEventListener('input', convertCurrency);
