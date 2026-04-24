@@ -1,4 +1,4 @@
-sp_illico/
+illico/
 ├── config/
 │   ├── connexion.php
 │   └── db_illico.sql
