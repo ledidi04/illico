@@ -17,7 +17,7 @@ define('DB_CHARSET', 'utf8mb4');
 // Configuration de l'application
 define('APP_NAME', 'S&P illico');
 define('APP_URL', 'http://localhost/illico/main'); // Ajustez selon votre chemin
-define('APP_VERSION', '1.0.0');
+define('APP_VERSION', '1.4.0');
 define('TIMEZONE', 'America/Port-au-Prince');
 
 // Configuration du fuseau horaire
