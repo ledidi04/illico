@@ -2,7 +2,6 @@
 session_start();
 
 // ═══════════════════════════════════════════════════════════════
-<<<<<<< HEAD
 // DÉTECTION DYNAMIQUE DE LA RACINE DU SITE
 // ═══════════════════════════════════════════════════════════════
 $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
@@ -24,37 +23,10 @@ if (isset($_SESSION['user_id'])) {
         case 'secretaire': header('Location: ' . $base_url . 'secretaire/dashboard.php'); break;
         case 'caissier': header('Location: ' . $base_url . 'caissier/dashboard.php'); break;
         default: header('Location: ' . $base_url . 'login.php');
-=======
-// DÉTECTION DE LA RACINE DU SITE
-// ═══════════════════════════════════════════════════════════════
-$protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-$host = $_SERVER['HTTP_HOST'];
-$base_url = $protocol . '://' . $host . '/';
-
-// Si déjà connecté, rediriger vers le dashboard approprié
-if (isset($_SESSION['user_id'])) {
-    $role = $_SESSION['role'] ?? '';
-    switch ($role) {
-        case 'admin':
-            header('Location: ' . $base_url . 'main/admin/dashboard.php');
-            break;
-        case 'secretaire':
-            header('Location: ' . $base_url . 'main/secretaire/dashboard.php');
-            break;
-        case 'caissier':
-            header('Location: ' . $base_url . 'main/caissier/dashboard.php');
-            break;
-        default:
-            header('Location: ' . $base_url . 'main/login.php');
->>>>>>> 1844c243e122a18003ae2deb44f07b156f3eaa4b
     }
     exit;
 }
 
-<<<<<<< HEAD
-=======
-// Taux de change simulés
->>>>>>> 1844c243e122a18003ae2deb44f07b156f3eaa4b
 $taux_jour = [
     'USD' => ['achat' => 132.50, 'vente' => 135.75, 'change' => '+0.8%'],
     'EUR' => ['achat' => 142.80, 'vente' => 146.50, 'change' => '-0.3%'],
@@ -68,39 +40,11 @@ $date_taux = date('d/m/Y');
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<<<<<<< HEAD
     <title>S&P illico — Banque Communautaire</title>
     <link rel="icon" type="image/jpeg" href="main/logo.jpeg">
     <base href="<?= $base_url ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-=======
-    <meta name="description" content="S&P illico - Banque Communautaire moderne, sécurisée et accessible">
-    <meta name="keywords" content="banque, Haïti, S&P illico, services bancaires, épargne, crédit">
-    
-    <!-- Google Site Verification -->
-    <meta name="google-site-verification" content="3nwKsS1wmJGr_cQaYEeoI9Uekodt6WThBHFCblXmXQA" />
-    
-    <title>S&P illico - Banque Communautaire</title>
-    
-    <!-- ═══════════════════════════════════════════════════════ -->
-    <!-- BALISE BASE POUR LES CHEMINS ABSOLUS -->
-    <!-- ═══════════════════════════════════════════════════════ -->
-    <base href="<?= $base_url ?>">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="main/logo.jpeg">
-    
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- AOS Animation Library -->
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    
->>>>>>> 1844c243e122a18003ae2deb44f07b156f3eaa4b
     <style>
         /* ========== RESET & ROOT ========== */
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -179,7 +123,6 @@ $date_taux = date('d/m/Y');
             text-decoration: none;
             flex-shrink: 0;
         }
-<<<<<<< HEAD
 
         .logo-mark {
             width: 48px; height: 48px;
@@ -188,119 +131,6 @@ $date_taux = date('d/m/Y');
             display: flex; align-items: center; justify-content: center;
             color: white; font-size: 22px;
             box-shadow: 0 4px 16px rgba(30,58,138,0.35);
-=======
-        
-        .logo-icon {
-            width: 45px;
-            height: 45px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 24px;
-            overflow: hidden;
-        }
-        
-        .logo-icon img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .logo-text {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--dark);
-        }
-        
-        .logo-text span {
-            color: var(--primary);
-        }
-        
-        .nav-menu {
-            display: flex;
-            align-items: center;
-            gap: 30px;
-        }
-        
-        .nav-links {
-            display: flex;
-            gap: 30px;
-        }
-        
-        .nav-link {
-            text-decoration: none;
-            color: var(--gray);
-            font-weight: 500;
-            font-size: 15px;
-            transition: color 0.3s;
-            position: relative;
-        }
-        
-        .nav-link:hover {
-            color: var(--primary);
-        }
-        
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: var(--primary);
-            transition: width 0.3s;
-        }
-        
-        .nav-link:hover::after {
-            width: 100%;
-        }
-        
-        .nav-link.active {
-            color: var(--primary);
-        }
-        
-        .nav-link.active::after {
-            width: 100%;
-        }
-        
-        .btn-login {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-            color: white !important;
-            padding: 12px 28px;
-            border-radius: 30px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 14px;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .btn-login:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(30, 58, 138, 0.4);
-        }
-        
-        .mobile-toggle {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 24px;
-            color: var(--dark);
-            cursor: pointer;
-        }
-        
-        /* ========== CARROUSEL ========== */
-        .carousel {
-            margin-top: 80px;
-            position: relative;
-            height: 600px;
->>>>>>> 1844c243e122a18003ae2deb44f07b156f3eaa4b
             overflow: hidden;
         }
 
@@ -1215,7 +1045,6 @@ $date_taux = date('d/m/Y');
             padding: 24px 0;
             display: flex; justify-content: space-between; align-items: center;
         }
-<<<<<<< HEAD
 
         .footer-bar p { color: rgba(255,255,255,0.35); font-size: 13px; }
 
@@ -1225,67 +1054,6 @@ $date_taux = date('d/m/Y');
 
         /* ========== ANIMATIONS ========== */
         @keyframes fadeUp {
-=======
-        
-        .footer-links h4 {
-            font-size: 18px;
-            margin-bottom: 20px;
-        }
-        
-        .footer-links ul {
-            list-style: none;
-        }
-        
-        .footer-links li {
-            margin-bottom: 12px;
-        }
-        
-        .footer-links a {
-            color: #94a3b8;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-        
-        .footer-links a:hover {
-            color: white;
-        }
-        
-        .footer-contact p {
-            color: #94a3b8;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .footer-contact i {
-            width: 20px;
-            color: var(--primary-light);
-        }
-        
-        .footer-bottom {
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            padding-top: 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: #94a3b8;
-            font-size: 14px;
-        }
-        
-        .footer-bottom-links {
-            display: flex;
-            gap: 30px;
-        }
-        
-        .footer-bottom-links a {
-            color: #94a3b8;
-            text-decoration: none;
-        }
-        
-        /* ========== ANIMATIONS ========== */
-        @keyframes slideInUp {
->>>>>>> 1844c243e122a18003ae2deb44f07b156f3eaa4b
             from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
         }
@@ -1373,7 +1141,6 @@ $date_taux = date('d/m/Y');
     </style>
 </head>
 <body>
-<<<<<<< HEAD
 
 <!-- ===== MOBILE NAV ===== -->
 <div class="mobile-nav" id="mobileNav">
@@ -1398,36 +1165,13 @@ $date_taux = date('d/m/Y');
                 <div class="logo-name">
                     <div class="brand">S&P <span>illico</span></div>
                     <div class="tagline">Banque Communautaire</div>
-=======
-    <!-- ========== NAVBAR ========== -->
-    <nav class="navbar" id="navbar">
-        <div class="nav-container">
-            <a href="./" class="logo">
-                <div class="logo-icon">
-                    <img src="main/logo.jpeg" alt="S&P illico" style="width: 100%; height: auto;">
->>>>>>> 1844c243e122a18003ae2deb44f07b156f3eaa4b
                 </div>
             </a>
-<<<<<<< HEAD
 
             <div class="nav-center">
                 <!-- Accueil -->
                 <div class="nav-item">
                     <a href="index.php" class="nav-link active">Accueil</a>
-=======
-            
-            <button class="mobile-toggle" id="mobileToggle">
-                <i class="fas fa-bars"></i>
-            </button>
-            
-            <div class="nav-menu">
-                <div class="nav-links" id="navLinks">
-                    <a href="./" class="nav-link active">Accueil</a>
-                    <a href="#services" class="nav-link">Services</a>
-                    <a href="#rates" class="nav-link">Taux</a>
-                    <a href="#about" class="nav-link">À propos</a>
-                    <a href="#contact" class="nav-link">Contact</a>
->>>>>>> 1844c243e122a18003ae2deb44f07b156f3eaa4b
                 </div>
 
                 <!-- Services dropdown -->
@@ -1928,7 +1672,6 @@ $date_taux = date('d/m/Y');
                 </a>
             </div>
         </div>
-<<<<<<< HEAD
     </div>
 </section>
 
@@ -2069,59 +1812,10 @@ $date_taux = date('d/m/Y');
                         <a href="mailto:illicoms01@gmail.com" style="color:rgba(255,255,255,0.5); font-size:14px; text-decoration:none;">
                             <i class="fas fa-envelope"></i> illicoms01@gmail.com
                         </a>
-=======
-    </nav>
-    
-    <!-- ========== CARROUSEL ========== -->
-    <section class="carousel">
-        <div class="carousel-container">
-            <div class="carousel-slide active" style="background-image: url('https://images.unsplash.com/photo-1560520653-9e0e4c89eb11?w=1600');">
-                <div class="slide-overlay"></div>
-                <div class="slide-content">
-                    <h1>Votre banque communautaire de confiance</h1>
-                    <p>Des services bancaires modernes, accessibles et sécurisés pour toute la communauté.</p>
-                    <div class="slide-buttons">
-                        <a href="main/index.php" class="btn-primary">
-                            <i class="fas fa-user"></i>
-                            Ouvrir un compte
-                        </a>
-                        <a href="#services" class="btn-outline-light">Découvrir nos services</a>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1600');">
-                <div class="slide-overlay"></div>
-                <div class="slide-content">
-                    <h1>Épargnez pour votre avenir</h1>
-                    <p>Des taux d'intérêt compétitifs et des solutions d'épargne adaptées à vos besoins.</p>
-                    <div class="slide-buttons">
-                        <a href="main/index.php" class="btn-primary">
-                            <i class="fas fa-piggy-bank"></i>
-                            Commencer à épargner
-                        </a>
-                        <a href="#rates" class="btn-outline-light">Voir les taux</a>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=1600');">
-                <div class="slide-overlay"></div>
-                <div class="slide-content">
-                    <h1>Gérez vos finances en toute simplicité</h1>
-                    <p>Accédez à vos comptes 24/7, effectuez des transactions et suivez vos opérations.</p>
-                    <div class="slide-buttons">
-                        <a href="main/index.php" class="btn-primary">
-                            <i class="fas fa-sign-in-alt"></i>
-                            Se connecter
-                        </a>
-                        <a href="#contact" class="btn-outline-light">Nous contacter</a>
->>>>>>> 1844c243e122a18003ae2deb44f07b156f3eaa4b
                     </div>
                 </div>
             </div>
         </div>
-<<<<<<< HEAD
     </div>
 </section>
 
@@ -2316,239 +2010,5 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
     });
 });
 </script>
-=======
-        
-        <div class="carousel-indicators">
-            <div class="indicator active" data-slide="0"></div>
-            <div class="indicator" data-slide="1"></div>
-            <div class="indicator" data-slide="2"></div>
-        </div>
-        
-        <button class="carousel-arrow prev" onclick="changeSlide(-1)">
-            <i class="fas fa-chevron-left"></i>
-        </button>
-        <button class="carousel-arrow next" onclick="changeSlide(1)">
-            <i class="fas fa-chevron-right"></i>
-        </button>
-    </section>
-    
-    <!-- ========== CARTES SERVICES ========== -->
-    <section class="services" id="services">
-        <div class="container">
-            <div class="section-header" data-aos="fade-up">
-                <h2>Nos Services</h2>
-                <p>Des solutions bancaires complètes pour tous vos besoins</p>
-            </div>
-            
-            <div class="services-grid">
-                <div class="service-card" data-aos="fade-up" data-aos-delay="100">
-                    <div class="service-icon"><i class="fas fa-piggy-bank"></i></div>
-                    <h3>Compte Épargne</h3>
-                    <p>Faites fructifier votre argent avec nos comptes épargne à taux compétitifs.</p>
-                </div>
-                <div class="service-card" data-aos="fade-up" data-aos-delay="200">
-                    <div class="service-icon"><i class="fas fa-credit-card"></i></div>
-                    <h3>Compte Courant</h3>
-                    <p>Gérez vos opérations quotidiennes avec flexibilité et simplicité.</p>
-                </div>
-                <div class="service-card" data-aos="fade-up" data-aos-delay="300">
-                    <div class="service-icon"><i class="fas fa-exchange-alt"></i></div>
-                    <h3>Virements</h3>
-                    <p>Transférez de l'argent rapidement et en toute sécurité entre comptes.</p>
-                </div>
-                <div class="service-card" data-aos="fade-up" data-aos-delay="400">
-                    <div class="service-icon"><i class="fas fa-shield-alt"></i></div>
-                    <h3>Sécurité 24/7</h3>
-                    <p>Vos transactions et données sont protégées par les dernières technologies.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-    
-    <!-- ========== TAUX DU JOUR ========== -->
-    <section class="rates-section" id="rates">
-        <div class="container">
-            <div class="rates-header" data-aos="fade-up">
-                <h2><i class="fas fa-chart-line"></i> Taux du jour</h2>
-                <p>Taux de change en temps réel - <?= $date_taux ?></p>
-            </div>
-            
-            <div class="rates-container">
-                <div class="rates-table" data-aos="fade-right">
-                    <h3><i class="fas fa-dollar-sign"></i> Taux de change</h3>
-                    <table>
-                        <thead>
-                            <tr><th>Devise</th><th>Achat (HTG)</th><th>Vente (HTG)</th></tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($taux_jour as $devise => $taux): ?>
-                            <tr>
-                                <td><strong><?= $devise ?></strong></td>
-                                <td><?= number_format($taux['achat'], 2) ?></td>
-                                <td><?= number_format($taux['vente'], 2) ?></td>
-                            </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                    <div class="rate-date"><i class="far fa-clock"></i> Dernière mise à jour : aujourd'hui à 09:00</div>
-                </div>
-                
-                <div class="converter-box" data-aos="fade-left">
-                    <h3><i class="fas fa-calculator"></i> Convertisseur</h3>
-                    <div class="converter-form">
-                        <div class="converter-input">
-                            <label>Montant</label>
-                            <input type="number" id="amount" placeholder="0.00" value="100">
-                        </div>
-                        <div class="converter-input">
-                            <label>De</label>
-                            <select id="fromCurrency">
-                                <option value="USD">USD - Dollar US</option>
-                                <option value="HTG">HTG - Gourde Haïtienne</option>
-                                <option value="EUR">EUR - Euro</option>
-                            </select>
-                        </div>
-                        <div class="converter-input">
-                            <label>Vers</label>
-                            <select id="toCurrency">
-                                <option value="HTG">HTG - Gourde Haïtienne</option>
-                                <option value="USD">USD - Dollar US</option>
-                                <option value="EUR">EUR - Euro</option>
-                            </select>
-                        </div>
-                        <button class="btn-convert" onclick="convertCurrency()">
-                            <i class="fas fa-sync-alt"></i> Convertir
-                        </button>
-                        <div class="converter-result" id="converterResult">
-                            <div class="amount" id="resultAmount">13,250.00</div>
-                            <div class="label" id="resultLabel">HTG</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    
-    <!-- ========== FOOTER ========== -->
-    <footer class="footer" id="contact">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-about">
-                    <div class="logo">
-                        <div class="logo-icon"><i class="fas fa-building-columns"></i></div>
-                        <div class="logo-text" style="color: white;">S&P <span>illico</span></div>
-                    </div>
-                    <p>Votre partenaire bancaire de confiance, engagé à offrir des services financiers accessibles et innovants à toute la communauté haïtienne.</p>
-                    <div class="footer-social">
-                        <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
-                    </div>
-                </div>
-                <div class="footer-links">
-                    <h4>Liens rapides</h4>
-                    <ul>
-                        <li><a href="./">Accueil</a></li>
-                        <li><a href="#services">Services</a></li>
-                        <li><a href="#rates">Taux du jour</a></li>
-                        <li><a href="#">À propos</a></li>
-                        <li><a href="#">Carrières</a></li>
-                    </ul>
-                </div>
-                <div class="footer-links">
-                    <h4>Services</h4>
-                    <ul>
-                        <li><a href="main/index.php">Banque en ligne</a></li>
-                        <li><a href="#">Comptes épargne</a></li>
-                        <li><a href="#">Comptes courant</a></li>
-                        <li><a href="#">Prêts</a></li>
-                        <li><a href="#">Cartes bancaires</a></li>
-                    </ul>
-                </div>
-                <div class="footer-contact">
-                    <h4>Contact</h4>
-                    <p><i class="fas fa-map-marker-alt"></i> Quartier Muraille, Terrier-Rouge, Haïti</p>
-                    <p><i class="fas fa-phone"></i> +509 3338-3509</p>
-                    <p><i class="fas fa-envelope"></i> illicoms01@gmail.com</p>
-                    <p><i class="fas fa-clock"></i> Lun-Dim: 8h00 - 20h00</p>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; <?= date('Y') ?> S&P illico - Banque Communautaire. Tous droits réservés.</p>
-                <div class="footer-bottom-links">
-                    <a href="#">Confidentialité</a>
-                    <a href="#">Conditions d'utilisation</a>
-                    <a href="#">Mentions légales</a>
-                </div>
-            </div>
-        </div>
-    </footer>
-    
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script>
-        AOS.init({ duration: 800, once: true });
-        
-        window.addEventListener('scroll', function() {
-            const navbar = document.getElementById('navbar');
-            navbar.classList.toggle('scrolled', window.scrollY > 50);
-        });
-        
-        let currentSlide = 0;
-        const slides = document.querySelectorAll('.carousel-slide');
-        const indicators = document.querySelectorAll('.indicator');
-        let autoSlideInterval;
-        
-        function showSlide(index) {
-            if (index >= slides.length) index = 0;
-            if (index < 0) index = slides.length - 1;
-            slides.forEach(s => s.classList.remove('active'));
-            indicators.forEach(i => i.classList.remove('active'));
-            slides[index].classList.add('active');
-            indicators[index].classList.add('active');
-            currentSlide = index;
-        }
-        
-        function changeSlide(d) { showSlide(currentSlide + d); resetAutoSlide(); }
-        function resetAutoSlide() { clearInterval(autoSlideInterval); autoSlideInterval = setInterval(() => showSlide(currentSlide + 1), 5000); }
-        
-        indicators.forEach((ind, i) => ind.addEventListener('click', () => { showSlide(i); resetAutoSlide(); }));
-        autoSlideInterval = setInterval(() => showSlide(currentSlide + 1), 5000);
-        
-        document.getElementById('mobileToggle').addEventListener('click', () => {
-            document.getElementById('navLinks').classList.toggle('active');
-        });
-        
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) target.scrollIntoView({ behavior: 'smooth' });
-            });
-        });
-        
-        const rates = <?= json_encode($taux_jour) ?>;
-        rates['HTG'] = { achat: 1, vente: 1 };
-        
-        function convertCurrency() {
-            const amount = parseFloat(document.getElementById('amount').value) || 0;
-            const from = document.getElementById('fromCurrency').value;
-            const to = document.getElementById('toCurrency').value;
-            let result;
-            if (from === to) result = amount;
-            else if (from === 'HTG') result = amount / rates[to].vente;
-            else if (to === 'HTG') result = amount * rates[from].achat;
-            else result = (amount * rates[from].achat) / rates[to].vente;
-            
-            document.getElementById('resultAmount').textContent = result.toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            document.getElementById('resultLabel').textContent = to;
-        }
-        
-        convertCurrency();
-        document.getElementById('fromCurrency').addEventListener('change', convertCurrency);
-        document.getElementById('toCurrency').addEventListener('change', convertCurrency);
-        document.getElementById('amount').addEventListener('input', convertCurrency);
-    </script>
->>>>>>> 1844c243e122a18003ae2deb44f07b156f3eaa4b
 </body>
 </html>
