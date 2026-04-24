@@ -1,4 +1,4 @@
-illico/
+main/
 ├── config/
 │   ├── connexion.php
 │   └── db_illico.sql
@@ -25,8 +25,6 @@ illico/
 │   └── fpdf/
 │       └── fpdf.php
 ├── index.php
-├── error.php
-├── .htaccess
 ├── dashboard.php
 ├── logout.php
 ├── admin/
