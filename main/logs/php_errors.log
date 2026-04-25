@@ -1,0 +1,36 @@
+[24-Apr-2026 22:03:15 America/Port-au-Prince] PHP Fatal error:  Uncaught TypeError: in_array(): Argument #2 ($haystack) must be of type array, string given in C:\wamp64\www\illico\main\generate_pdf.php:647
+Stack trace:
+#0 C:\wamp64\www\illico\main\generate_pdf.php(647): in_array('client_69ec20c9...', 'uploads/photos/...')
+#1 C:\wamp64\www\illico\main\generate_pdf.php(1030): genFicheClient(Object(PDO), '00004', '')
+#2 {main}
+  thrown in C:\wamp64\www\illico\main\generate_pdf.php on line 647
+[24-Apr-2026 22:03:52 America/Port-au-Prince] PHP Fatal error:  Uncaught TypeError: in_array(): Argument #2 ($haystack) must be of type array, string given in C:\wamp64\www\illico\main\generate_pdf.php:647
+Stack trace:
+#0 C:\wamp64\www\illico\main\generate_pdf.php(647): in_array('client_69ec20c9...', 'uploads/photos/...')
+#1 C:\wamp64\www\illico\main\generate_pdf.php(1030): genFicheClient(Object(PDO), '00004', '')
+#2 {main}
+  thrown in C:\wamp64\www\illico\main\generate_pdf.php on line 647
+[24-Apr-2026 22:07:25 America/Port-au-Prince] PHP Fatal error:  Uncaught TypeError: in_array(): Argument #2 ($haystack) must be of type array, string given in C:\wamp64\www\illico\main\generate_pdf.php:647
+Stack trace:
+#0 C:\wamp64\www\illico\main\generate_pdf.php(647): in_array('client_69ec20c9...', 'uploads/photos/...')
+#1 C:\wamp64\www\illico\main\generate_pdf.php(1030): genFicheClient(Object(PDO), '00004', '')
+#2 {main}
+  thrown in C:\wamp64\www\illico\main\generate_pdf.php on line 647
+[24-Apr-2026 22:08:26 America/Port-au-Prince] PHP Fatal error:  Uncaught TypeError: in_array(): Argument #2 ($haystack) must be of type array, string given in C:\wamp64\www\illico\main\generate_pdf.php:647
+Stack trace:
+#0 C:\wamp64\www\illico\main\generate_pdf.php(647): in_array('client_69ec20c9...', 'uploads/photos/...')
+#1 C:\wamp64\www\illico\main\generate_pdf.php(1030): genFicheClient(Object(PDO), '00004', '')
+#2 {main}
+  thrown in C:\wamp64\www\illico\main\generate_pdf.php on line 647
+[24-Apr-2026 22:08:30 America/Port-au-Prince] PHP Fatal error:  Uncaught TypeError: in_array(): Argument #2 ($haystack) must be of type array, string given in C:\wamp64\www\illico\main\generate_pdf.php:647
+Stack trace:
+#0 C:\wamp64\www\illico\main\generate_pdf.php(647): in_array('client_69ec20c9...', 'uploads/photos/...')
+#1 C:\wamp64\www\illico\main\generate_pdf.php(1030): genFicheClient(Object(PDO), '00004', '')
+#2 {main}
+  thrown in C:\wamp64\www\illico\main\generate_pdf.php on line 647
+[24-Apr-2026 22:09:54 America/Port-au-Prince] PHP Fatal error:  Uncaught TypeError: in_array(): Argument #2 ($haystack) must be of type array, string given in C:\wamp64\www\illico\main\generate_pdf.php:644
+Stack trace:
+#0 C:\wamp64\www\illico\main\generate_pdf.php(644): in_array('client_69ec20c9...', 'uploads/photos/...')
+#1 C:\wamp64\www\illico\main\generate_pdf.php(1027): genFicheClient(Object(PDO), '00004', '')
+#2 {main}
+  thrown in C:\wamp64\www\illico\main\generate_pdf.php on line 644

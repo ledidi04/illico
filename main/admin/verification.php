@@ -277,12 +277,31 @@ $currentPage = 'verification';
                 <!-- Titulaire -->
                 <h4 style="margin-bottom:12px;color:#1e293b;"><i class="fas fa-user-circle"></i> Titulaire principal</h4>
                 <div class="info-grid" style="margin-bottom:20px;">
-                    <?php if ($compte['photo']): ?>
-                    <div class="info-item" style="grid-column:span 2;display:flex;align-items:center;gap:12px;">
-                        <img src="../<?= htmlspecialchars($compte['photo']) ?>" style="width:60px;height:60px;border-radius:10px;object-fit:cover;">
-                        <div><strong><?= htmlspecialchars($compte['titulaire']) ?></strong><br><span style="color:#64748b;"><?= htmlspecialchars($compte['id_client']) ?></span></div>
-                    </div>
-                    <?php endif; ?>
+                   <?php if (!empty($compte['photo'])): ?>
+<?php
+// Déterminer le chemin correct de la photo
+$photoPath = $compte['photo'];
+// Si le chemin commence par 'uploads/', ajouter '../' car on est dans le dossier secretaire/
+if (strpos($photoPath, 'uploads/') === 0) {
+    $photoPath = '../' . $photoPath;
+}
+// Vérifier si le fichier existe
+$photoExists = file_exists($photoPath);
+?>
+<div class="info-item" style="grid-column:span 2;display:flex;align-items:center;gap:12px;">
+                <?php if ($photoExists): ?>
+                <img src="<?= htmlspecialchars($photoPath) ?>" style="width:60px;height:60px;border-radius:10px;object-fit:cover;border:1px solid #e2e8f0;">
+                <?php else: ?>
+                <div style="width:60px;height:60px;border-radius:50%;background:#fef3c7;display:flex;align-items:center;justify-content:center;">
+                    <i class="fas fa-user" style="color:#d97706;font-size:24px;"></i>
+                </div>
+                <?php endif; ?>
+                <div>
+                    <strong><?= htmlspecialchars($compte['titulaire']) ?></strong><br>
+                    <span style="color:#64748b;font-size:12px;"><?= htmlspecialchars($compte['id_client']) ?></span>
+                </div>
+            </div>
+            <?php endif; ?>
                     <div class="info-item"><div class="info-label">Téléphone</div><div class="info-value"><?= htmlspecialchars($compte['telephone']?:'—') ?></div></div>
                     <div class="info-item"><div class="info-label">Email</div><div class="info-value"><?= htmlspecialchars($compte['email']?:'—') ?></div></div>
                     <div class="info-item"><div class="info-label">Date de naissance</div><div class="info-value"><?= $compte['date_naissance']?date('d/m/Y',strtotime($compte['date_naissance'])):'—' ?></div></div>

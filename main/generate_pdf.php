@@ -631,20 +631,24 @@ function genFicheClient(PDO $pdo, string $id_compte, string $id_client_recherche
     $pdf->setDraw(IllicoPDF::C_BLEU);
     $pdf->Rect($xPhoto, $yPhoto, $wPhoto, $hPhoto);
 
-    // Photo si disponible
+    // Photo si disponible - CORRIGÉ (suppression du doublon)
     $photoPath = null;
     if (!empty($client['photo'])) {
         $tryPaths = [
-            __DIR__.'/uploads/photos/'.basename($client['photo']),
-            __DIR__.'/'.ltrim($client['photo'],'/'),
-            __DIR__.'/../'.ltrim($client['photo'],'./'),
+            __DIR__ . '/../uploads/photos/' . basename($client['photo']),
+            __DIR__ . '/uploads/photos/' . basename($client['photo']),
+            __DIR__ . '/' . str_replace('../', '', $client['photo']),
+            __DIR__ . '/../' . str_replace('uploads/photos/', '', $client['photo']),
         ];
+        
         foreach ($tryPaths as $p) {
-            if (file_exists($p) && in_array(strtolower(pathinfo($p,PATHINFO_EXTENSION)),['jpg','jpeg','png'])) {
-                $photoPath = $p; break;
+            if (file_exists($p) && in_array(strtolower(pathinfo($p, PATHINFO_EXTENSION)), ['jpg','jpeg','png','gif'])) {
+                $photoPath = $p;
+                break;
             }
         }
     }
+    
     if ($photoPath) {
         $ext = strtolower(pathinfo($photoPath, PATHINFO_EXTENSION));
         $fpdfType = ($ext === 'png') ? 'PNG' : 'JPEG';
@@ -658,6 +662,7 @@ function genFicheClient(PDO $pdo, string $id_compte, string $id_client_recherche
         $pdf->SetXY($xPhoto, $yPhoto + $hPhoto/2);
         $pdf->Cell($wPhoto, 5, "D'IDENTITE", 0, 1, 'C');
     }
+    
     $pdf->SetFont('Arial','',7);
     $pdf->setColor(IllicoPDF::C_GRIS);
     $pdf->SetXY($xPhoto, $yPhoto+$hPhoto+1);
