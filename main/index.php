@@ -101,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
     
-    // Si on arrive ici, c'est qu'il y a une erreur
+    
     // Rediriger vers la même page avec l'erreur en GET pour éviter la resoumission
     if ($error) {
         $_SESSION['login_error'] = $error;
