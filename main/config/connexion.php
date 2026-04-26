@@ -11,7 +11,7 @@ ini_set('session.use_strict_mode', 1);
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'db_illico');
 define('DB_USER', 'root');
-define('DB_PASS', 'Enilson2004#');
+define('DB_PASS', '');
 define('DB_CHARSET', 'utf8mb4');
 
 // Configuration de l'application
