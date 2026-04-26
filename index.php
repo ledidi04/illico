@@ -47,7 +47,7 @@ $date_taux = date('d/m/Y');
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* ========== RESET & ROOT ========== */
+        /* ========= RESET & ROOT ========= */
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
